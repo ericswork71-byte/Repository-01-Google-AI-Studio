@@ -1,0 +1,6 @@
+{
+  "name": "Another day dreaming",
+  "description": "An interactive learning playground to design, preview, and output custom web pages integrated with free online forms platforms.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
