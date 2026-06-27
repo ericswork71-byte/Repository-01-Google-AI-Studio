@@ -596,11 +596,11 @@ export default function App() {
                     const fallbackYear = isScanners ? "1981" : "1964";
                     const fallbackAvg = isScanners ? "3.7 out of 5" : "4.1 out of 5";
                     const fallbackExcerpt = isScanners 
-                      ? "David Cronenberg’s bizarre, fleshy sci-fi masterpiece is one of the ultimate body horror movies of the 1980s. The head-exploding scene is legendary, but the film's lasting power comes from its slow-burn corporate espionage tension."
-                      : "John Frankenheimer's masterpiece is one of the greatest war-action films ever made. Burt Lancaster is phenomenal in his physical commitment, carrying the heavy train machinery scenes with incredible realism.";
+                      ? "David Cronenberg’s bizarre, fleshy sci-fi masterpiece is one of the ultimate body horror movies of the 1980s. The head-exploding scene is legendary, but the film's lasting power comes from its slow-burn corporate espionage tension and Michael Ironside's terrifying, career-defining performance as Revok."
+                      : "John Frankenheimer's masterpiece is one of the greatest war-action films ever made. Burt Lancaster is phenomenal in his physical commitment, carrying the heavy train machinery scenes with incredible realism, and Paul Scofield plays the perfect cold-hearted Nazi art plunderer. Real trains, real explosions, pure cinematic genius with zero CGI.";
                     const fallbackImage = isScanners
                       ? "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=400&h=600&q=80"
-                      : "https://images.unsplash.com/photo-1542206395-9feb3edaa68d?auto=format&fit=crop&w=400&h=600&q=80";
+                      : "https://images.unsplash.com/photo-1532103054090-334e6e60b73a?auto=format&fit=crop&w=400&h=600&q=80";
                     const fallbackLikes = isScanners ? "158" : "42";
                     const fallbackRating = isScanners ? "★★★★" : "★★★★★";
                     const fallbackTags = isScanners 

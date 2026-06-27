@@ -575,7 +575,7 @@ ${itemsXml}
           year = "1964";
           rating = "★★★★★";
           reviewExcerpt = "John Frankenheimer's masterpiece is one of the greatest war-action films ever made. Burt Lancaster is phenomenal in his physical commitment, carrying the heavy train machinery scenes with incredible realism, and Paul Scofield plays the perfect cold-hearted Nazi art plunderer. Real trains, real explosions, pure cinematic genius with zero CGI.";
-          imageUrl = "https://images.unsplash.com/photo-1542206395-9feb3edaa68d?auto=format&fit=crop&w=400&h=600&q=80";
+          imageUrl = "https://images.unsplash.com/photo-1532103054090-334e6e60b73a?auto=format&fit=crop&w=400&h=600&q=80";
         }
       }
 
@@ -737,7 +737,7 @@ ${itemsXml}
         year: "1964",
         rating: "★★★★★",
         reviewExcerpt: "John Frankenheimer's masterpiece is one of the greatest war-action films ever made. Burt Lancaster is phenomenal in his physical commitment, carrying the heavy train machinery scenes with incredible realism, and Paul Scofield plays the perfect cold-hearted Nazi art plunderer. Real trains, real explosions, pure cinematic genius with zero CGI.",
-        imageUrl: "https://images.unsplash.com/photo-1542206395-9feb3edaa68d?auto=format&fit=crop&w=400&h=600&q=80",
+        imageUrl: "https://images.unsplash.com/photo-1532103054090-334e6e60b73a?auto=format&fit=crop&w=400&h=600&q=80",
         link: "https://letterboxd.com/pirateneckbeard/film/the-train/",
         director: "John Frankenheimer",
         avgRating: "4.1 out of 5",
