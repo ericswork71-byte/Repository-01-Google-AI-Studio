@@ -1884,20 +1884,63 @@ export default function App() {
 
                           {/* FRAME 3 */}
                           <div className="w-full bg-slate-900/60 p-4 rounded-xl border border-slate-800 hover:border-indigo-500/40 transition-all">
-                            <div className="flex items-center justify-between pb-2 border-b border-slate-900/60 mb-3">
-                              <div className="flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-md shadow-indigo-500/50"></span>
-                                <span className="text-xs font-bold text-slate-100 tracking-tight uppercase font-mono">{lowerFrame3.title}</span>
+                            <span className="text-[9px] font-mono text-slate-500 mb-1 block">LOWER STACK FRAME 3 (Size Equal)</span>
+                            {lowerFrame3.type === 'content' && (
+                              <div>
+                                {lowerFrame3.contentBody && lowerFrame3.contentBody.includes('if-i-can-ill-go-and-see-them-at-the-cinema') ? (
+                                  <div>
+                                    <div className="flex items-center justify-between pb-2 border-b border-slate-900/60 mb-3">
+                                      <div className="flex items-center gap-1.5">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-md shadow-indigo-500/50"></span>
+                                        <span className="text-xs font-bold text-slate-100 tracking-tight uppercase font-mono">{lowerFrame3.title}</span>
+                                      </div>
+                                      <span className="text-[9px] font-mono text-slate-500">Live Cinema List</span>
+                                    </div>
+                                    <LetterboxdFilmReels 
+                                      sharedXml={sharedXml}
+                                      sharedLoading={sharedLoading}
+                                      sharedError={sharedError}
+                                      sharedIsReal={sharedIsReal}
+                                    />
+                                  </div>
+                                ) : lowerFrame3.contentBody && (lowerFrame3.contentBody.includes('letterboxd.com/') || lowerFrame3.contentBody.includes('/film/')) ? (
+                                  <LetterboxdReviewLiveCard url={lowerFrame3.contentBody} fallbackTitle={lowerFrame3.title} />
+                                ) : (
+                                  <>
+                                    <h4 className="text-xs font-bold text-white mb-1">{lowerFrame3.title}</h4>
+                                    <p className="text-xs text-slate-300 whitespace-pre-line leading-relaxed">{lowerFrame3.contentBody}</p>
+                                  </>
+                                )}
                               </div>
-                              <span className="text-[9px] font-mono text-slate-500">Live Cinema List</span>
-                            </div>
-
-                            <LetterboxdFilmReels 
-                              sharedXml={sharedXml}
-                              sharedLoading={sharedLoading}
-                              sharedError={sharedError}
-                              sharedIsReal={sharedIsReal}
-                            />
+                            )}
+                            {lowerFrame3.type === 'image' && (
+                              <div className="space-y-1">
+                                <h4 className="text-xs font-bold text-white mb-1">{lowerFrame3.title}</h4>
+                                <img src={lowerFrame3.imageUrl} alt="Frame Upload Mock" className="w-full h-20 object-cover rounded" />
+                                <p className="text-[10px] text-slate-400">{lowerFrame3.contentBody}</p>
+                              </div>
+                            )}
+                            {lowerFrame3.type === 'embed_tally' && (
+                              <div>
+                                <h4 className="text-xs font-bold text-white mb-1">{lowerFrame3.title}</h4>
+                                <div className="text-[9px] font-mono bg-slate-950 p-1.5 text-emerald-400 rounded text-center">
+                                  Embedded Iframe: Yes, Active Simulation (URL: {lowerFrame3.iframeUrl})
+                                </div>
+                              </div>
+                            )}
+                            {lowerFrame3.type === 'form' && (
+                              <div className="space-y-2">
+                                <h4 className="text-xs font-bold text-white">{lowerFrame3.title}</h4>
+                                <p className="text-[11px] text-slate-400 mb-1">{lowerFrame3.contentBody}</p>
+                                <input type="email" placeholder="Your email here..." className="w-full text-xs p-2 bg-slate-950 rounded border border-slate-850 text-white focus:outline-none" disabled />
+                                <button className="w-full bg-indigo-600 hover:bg-indigo-500 py-1 text-white font-bold text-[10px] uppercase rounded" disabled>Subscribe</button>
+                              </div>
+                            )}
+                            {lowerFrame3.type === 'custom_html' && (
+                              <div className="bg-slate-950 p-1 rounded text-[10px] font-mono text-slate-400 truncate">
+                                {lowerFrame3.contentBody}
+                              </div>
+                            )}
                           </div>
 
                         </div>
