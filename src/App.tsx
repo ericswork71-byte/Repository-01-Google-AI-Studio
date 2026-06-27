@@ -529,94 +529,230 @@ export default function App() {
                     </div>
                   \`;
                 } catch(e) {
-                  let opinionAuthorFallback = "pirateneckbeard";
-                  let opinionFilmFallback = "the train";
+                  // Try client-side parsing via corsproxy.io so it works beautifully on static GitHub Pages
                   try {
-                    let clean = reviewUrl.trim();
-                    while (clean.endsWith('/')) {
-                      clean = clean.slice(0, -1);
-                    }
-                    const parts = clean.split('/');
-                    if (parts.length > 3) {
-                      opinionAuthorFallback = parts[3];
-                    }
-                    if (parts.length > 0) {
-                      const lastPart = parts[parts.length - 1];
-                      opinionFilmFallback = lastPart.replace(/[-_]+/g, ' ');
-                    }
-                  } catch(err) {
-                    opinionAuthorFallback = "pirateneckbeard";
-                    opinionFilmFallback = "the train";
-                  }
-
-                  const isScannersFallback = reviewUrl.toLowerCase().includes('scanners');
-                  const fallbackDirector = isScannersFallback ? "David Cronenberg" : "John Frankenheimer";
-                  const fallbackFilmTitle = isScannersFallback ? "Scanners" : "The Train";
-                  const fallbackYear = isScannersFallback ? "1981" : "1964";
-                  const fallbackAvg = isScannersFallback ? "3.7 out of 5" : "4.1 out of 5";
-                  const fallbackExcerpt = isScannersFallback 
-                    ? "David Cronenberg’s bizarre, fleshy sci-fi masterpiece is one of the ultimate body horror movies of the 1980s. The head-exploding scene is legendary, but the film's lasting power comes from its slow-burn corporate espionage tension."
-                    : "John Frankenheimer's masterpiece is one of the greatest war-action films ever made. Burt Lancaster is phenomenal in his physical commitment, carrying the heavy train machinery scenes with incredible realism.";
-                  const fallbackImage = isScannersFallback
-                    ? "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=400&h=600&q=80"
-                    : "https://images.unsplash.com/photo-1542206395-9feb3edaa68d?auto=format&fit=crop&w=400&h=600&q=80";
-                  const fallbackLikes = isScannersFallback ? "158" : "42";
-                  const fallbackTags = isScannersFallback 
-                    ? '<span class="text-[9px] bg-indigo-950/20 text-indigo-350 px-2 py-0.5 rounded-md border border-indigo-900/20 font-mono">#horror</span><span class="text-[9px] bg-indigo-950/20 text-indigo-350 px-2 py-0.5 rounded-md border border-indigo-900/20 font-mono">#scifi</span>'
-                    : '<span class="text-[9px] bg-indigo-950/20 text-indigo-350 px-2 py-0.5 rounded-md border border-indigo-900/20 font-mono">#wwii</span><span class="text-[9px] bg-indigo-950/20 text-indigo-350 px-2 py-0.5 rounded-md border border-indigo-900/20 font-mono">#masterpiece</span>';
-
-                  targetEl.innerHTML = \`
-                    <div class="flex items-start justify-between mb-3 pb-2 border-b border-slate-900/60">
-                      <div class="flex flex-col gap-0.5 text-left">
-                        <div class="flex items-center gap-1.5">
-                          <span class="w-2 h-2 rounded-full bg-amber-500 shadow shadow-amber-500/10"></span>
-                          <span class="text-[10px] font-mono font-bold text-amber-500 tracking-wider">🎥 An interested review of \\\${opinionFilmFallback} by \\\${opinionAuthorFallback}</span>
-                        </div>
-                        <span class="text-xs font-bold text-slate-300 tracking-tight pl-3.5 block mt-0.5">Directed by \\\${fallbackDirector}</span>
-                      </div>
-                      <a href="\\\${reviewUrl}" target="_blank" class="text-slate-500 hover:text-slate-200 text-[10px] font-mono flex items-center gap-1 transition">
-                        View Letterboxd <svg class="w-3 h-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                      </a>
-                    </div>
+                    const corsUrl = "https://corsproxy.io/?" + encodeURIComponent(reviewUrl);
+                    const proxyRes = await fetch(corsUrl);
+                    if (!proxyRes.ok) throw new Error();
+                    const html = await proxyRes.text();
                     
-                    <div class="flex flex-col sm:flex-row gap-4 items-start text-left">
-                      <div class="w-24 sm:w-28 flex-shrink-0 relative group">
-                        <div class="w-full aspect-[2/3] bg-slate-900 rounded-lg overflow-hidden border border-slate-850 shadow-lg relative">
-                          <img src="\\\${fallbackImage}" alt="\\\${fallbackFilmTitle}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" referrerpolicy="no-referrer" />
+                    let title = "";
+                    const titleM = html.match(/<meta\s+property=["']og:title["']\s+content=["']([^"']+)["']/i) ||
+                                   html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']og:title["']/i);
+                    if (titleM) {
+                      title = titleM[1];
+                    } else {
+                      const tM = html.match(/<title>([^<]+)<\/title>/i);
+                      if (tM) title = tM[1];
+                    }
+
+                    let filmTitle = title || "";
+                    let year = "1964";
+                    const yearM = title.match(/\((\d{4})\)/);
+                    if (yearM) year = yearM[1];
+
+                    if (title.indexOf(" - review by ") !== -1) {
+                      filmTitle = title.split(" - review by ")[0].replace(/\s*\(\d{4}\)\s*/g, "").trim();
+                    } else if (title.indexOf("’s review of ") !== -1) {
+                      filmTitle = title.split("’s review of ")[1].replace(/\s*\(\d{4}\)\s*/g, "").trim();
+                    } else if (title.indexOf("'s review of ") !== -1) {
+                      filmTitle = title.split("'s review of ")[1].replace(/\s*\(\d{4}\)\s*/g, "").trim();
+                    } else {
+                      filmTitle = title.replace(/\s*\(\d{4}\)\s*/g, "").trim();
+                    }
+
+                    let imageUrl = "";
+                    const imgM = html.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i) ||
+                                 html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']og:image["']/i);
+                    if (imgM) imageUrl = imgM[1];
+
+                    let ogDesc = "";
+                    const descM = html.match(/<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']/i) ||
+                                  html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i) ||
+                                  html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']og:description["']/i);
+                    if (descM) ogDesc = descM[1];
+
+                    let rating = "";
+                    const starsM = ogDesc.match(/[★☆½+]{1,6}/) || title.match(/[★☆½+]{1,6}/);
+                    if (starsM) rating = starsM[0];
+
+                    let director = "";
+                    const dirHrefMatch = html.match(/href="\/director\/([^/"]+)\/"[^>]*>([^<]+)<\/a>/i);
+                    if (dirHrefMatch) {
+                      director = dirHrefMatch[2].replace(/<[^>]+>/g, '').trim();
+                    }
+
+                    let avgRating = "";
+                    const avgAttrMatch = html.match(/data-average-rating="([^"]+)"/i);
+                    if (avgAttrMatch) {
+                      avgRating = parseFloat(avgAttrMatch[1]).toFixed(1) + " out of 5";
+                    }
+
+                    let reviewExcerpt = "";
+                    const reviewDivM = html.match(/<div\s+class=["']review\s+body-text\s+-large["']>([\s\S]*?)<\/div>/i) ||
+                                       html.match(/<div\s+class=["']body-text\s+-large\s+review["']>([\s\S]*?)<\/div>/i) ||
+                                       html.match(/<div\s+class=["']review-body["']>([\s\S]*?)<\/div>/i);
+                    if (reviewDivM) {
+                      reviewExcerpt = reviewDivM[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+                    } else {
+                      reviewExcerpt = ogDesc;
+                      if (reviewExcerpt.startsWith("Review by ")) {
+                        const colonIdx = reviewExcerpt.indexOf(":");
+                        if (colonIdx !== -1) reviewExcerpt = reviewExcerpt.substring(colonIdx + 1).trim();
+                      }
+                    }
+                    if (reviewExcerpt.length > 500) reviewExcerpt = reviewExcerpt.slice(0, 490) + "...";
+
+                    let likes = "";
+                    const likesM = html.match(/class=["']like-link-count["']>([\s\S]*?)(\d+)/i) || html.match(/(\d+)\s+likes/i);
+                    if (likesM) likes = likesM[2] || likesM[1] || "";
+
+                    let opinionAuthor = "pirateneckbeard";
+                    try {
+                      let clean = reviewUrl.trim();
+                      while (clean.endsWith('/')) clean = clean.slice(0, -1);
+                      const parts = clean.split('/');
+                      if (parts.length > 3) opinionAuthor = parts[3];
+                    } catch(err) {}
+
+                    targetEl.innerHTML = \`
+                      <div class="flex items-start justify-between mb-3 pb-2 border-b border-slate-900/60">
+                        <div class="flex flex-col gap-0.5 text-left">
+                          <div class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-amber-500 shadow shadow-amber-500/10"></span>
+                            <span class="text-[10px] font-mono font-bold text-amber-500 tracking-wider">🎥 A review of \\\${filmTitle} by \\\${opinionAuthor}</span>
+                          </div>
+                          \\\${director ? \\\`<span class="text-xs font-bold text-slate-300 tracking-tight pl-3.5 block mt-0.5">Directed by \\\${director}</span>\\\` : ''}
+                        </div>
+                        <a href="\\\${reviewUrl}" target="_blank" class="text-slate-500 hover:text-slate-350 text-[10px] font-mono flex items-center gap-1 transition">
+                          View Letterboxd <svg class="w-3 h-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                        </a>
+                      </div>
+                      <div class="flex flex-col sm:flex-row gap-4 items-start text-left">
+                        <div class="w-24 sm:w-28 flex-shrink-0 relative group">
+                          <div class="w-full aspect-[2/3] bg-slate-900 rounded-lg overflow-hidden border border-slate-850 shadow-lg relative">
+                            <img src="\\\${imageUrl}" alt="\\\${filmTitle}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" referrerpolicy="no-referrer" />
+                          </div>
+                        </div>
+                        <div class="flex-grow space-y-3.5">
+                          <div class="space-y-1">
+                            <div class="flex flex-wrap items-baseline gap-2">
+                              <h4 class="text-sm font-black text-slate-100 tracking-tight leading-tight">\\\${filmTitle.replace(/[★☆½]/g, "").trim()}</h4>
+                              <span class="text-[10px] text-slate-500 font-mono">(\\\${year})</span>
+                              \\\${director ? \\\`<span class="text-[10px] text-slate-400 font-mono">• Dir: <span class="text-indigo-400 font-semibold">\\\${director}</span></span>\\\` : ''}
+                            </div>
+                            \\\${avgRating ? \\\`
+                            <div class="flex items-center gap-3">
+                              <div class="text-[10px] text-slate-500 font-mono flex items-center gap-1 bg-slate-900/50 px-1.5 py-0.5 rounded border border-slate-850">
+                                <span class="text-slate-600">Avg Film Rating:</span>
+                                <span class="text-slate-350 font-bold">\\\${avgRating}</span>
+                              </div>
+                            </div>
+                            \\\` : ''}
+                          </div>
+                          <div class="text-xs text-slate-300 italic leading-relaxed border-l-2 border-indigo-500/40 pl-3 py-0.5 whitespace-pre-line select-text">
+                            "\\\${reviewExcerpt}"
+                          </div>
+                          <div class="flex flex-wrap items-center justify-between gap-2 text-[9px] text-slate-500 font-mono pt-2 border-t border-slate-900/50">
+                            <div class="flex items-center gap-2">
+                              <span class="font-semibold text-slate-400">By \\\${opinionAuthor}</span>
+                              \\\${rating ? \\\`<span class="text-amber-400 font-bold ml-1">\\\${rating}</span>\\\` : ''}
+                              \\\${likes ? \\\`<span class="text-rose-400/90 bg-rose-950/30 px-1.5 py-0.5 rounded border border-rose-900/20 font-bold flex items-center gap-1">❤️ \\\${likes}</span>\\\` : ''}
+                            </div>
+                            <span class="text-[8px] bg-indigo-950/40 text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-900/30 font-mono">Parsed Live</span>
+                          </div>
                         </div>
                       </div>
-                      <div class="flex-grow space-y-3.5">
-                        <div class="space-y-1">
-                          <div class="flex flex-wrap items-baseline gap-2">
-                            <h4 class="text-sm font-black text-slate-100 tracking-tight leading-tight">\\\${fallbackFilmTitle}</h4>
-                            <span class="text-[10px] text-slate-500 font-mono">(\\\${fallbackYear})</span>
-                            <span class="text-[10px] text-slate-404 font-mono">• Dir: <span class="text-indigo-400 font-semibold">\\\${fallbackDirector}</span></span>
+                    \`;
+                  } catch (proxyErr) {
+                    let opinionAuthorFallback = "pirateneckbeard";
+                    let opinionFilmFallback = "the train";
+                    try {
+                      let clean = reviewUrl.trim();
+                      while (clean.endsWith('/')) {
+                        clean = clean.slice(0, -1);
+                      }
+                      const parts = clean.split('/');
+                      if (parts.length > 3) {
+                        opinionAuthorFallback = parts[3];
+                      }
+                      if (parts.length > 0) {
+                        const lastPart = parts[parts.length - 1];
+                        opinionFilmFallback = lastPart.replace(/[-_]+/g, ' ');
+                      }
+                    } catch(err) {
+                      opinionAuthorFallback = "pirateneckbeard";
+                      opinionFilmFallback = "the train";
+                    }
+
+                    const isScannersFallback = reviewUrl.toLowerCase().includes('scanners');
+                    const fallbackDirector = isScannersFallback ? "David Cronenberg" : "John Frankenheimer";
+                    const fallbackFilmTitle = isScannersFallback ? "Scanners" : "The Train";
+                    const fallbackYear = isScannersFallback ? "1981" : "1964";
+                    const fallbackAvg = isScannersFallback ? "3.7 out of 5" : "4.1 out of 5";
+                    const fallbackExcerpt = isScannersFallback 
+                      ? "David Cronenberg’s bizarre, fleshy sci-fi masterpiece is one of the ultimate body horror movies of the 1980s. The head-exploding scene is legendary, but the film's lasting power comes from its slow-burn corporate espionage tension."
+                      : "John Frankenheimer's masterpiece is one of the greatest war-action films ever made. Burt Lancaster is phenomenal in his physical commitment, carrying the heavy train machinery scenes with incredible realism.";
+                    const fallbackImage = isScannersFallback
+                      ? "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=400&h=600&q=80"
+                      : "https://images.unsplash.com/photo-1542206395-9feb3edaa68d?auto=format&fit=crop&w=400&h=600&q=80";
+                    const fallbackLikes = isScannersFallback ? "158" : "42";
+                    const fallbackTags = isScannersFallback 
+                      ? '<span class="text-[9px] bg-indigo-950/20 text-indigo-350 px-2 py-0.5 rounded-md border border-indigo-900/20 font-mono">#horror</span><span class="text-[9px] bg-indigo-950/20 text-indigo-350 px-2 py-0.5 rounded-md border border-indigo-900/20 font-mono">#scifi</span>'
+                      : '<span class="text-[9px] bg-indigo-950/20 text-indigo-350 px-2 py-0.5 rounded-md border border-indigo-900/20 font-mono">#wwii</span><span class="text-[9px] bg-indigo-950/20 text-indigo-350 px-2 py-0.5 rounded-md border border-indigo-900/20 font-mono">#masterpiece</span>';
+
+                    targetEl.innerHTML = \`
+                      <div class="flex items-start justify-between mb-3 pb-2 border-b border-slate-900/60">
+                        <div class="flex flex-col gap-0.5 text-left">
+                          <div class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-amber-500 shadow shadow-amber-500/10"></span>
+                            <span class="text-[10px] font-mono font-bold text-amber-500 tracking-wider">🎥 An interested review of \${opinionFilmFallback} by \${opinionAuthorFallback}</span>
                           </div>
-                          <div class="flex items-center gap-3">
-                            <div class="text-[10px] text-slate-500 font-mono flex items-center gap-1 bg-slate-900/50 px-1.5 py-0.5 rounded border border-slate-850">
-                              <span class="text-slate-600">Avg Film Rating:</span>
-                              <span class="text-slate-350 font-bold">\\\${fallbackAvg}</span>
+                          <span class="text-xs font-bold text-slate-300 tracking-tight pl-3.5 block mt-0.5">Directed by \${fallbackDirector}</span>
+                        </div>
+                        <a href="\${reviewUrl}" target="_blank" class="text-slate-500 hover:text-slate-200 text-[10px] font-mono flex items-center gap-1 transition">
+                          View Letterboxd <svg class="w-3 h-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                        </a>
+                      </div>
+                      
+                      <div class="flex flex-col sm:flex-row gap-4 items-start text-left">
+                        <div class="w-24 sm:w-28 flex-shrink-0 relative group">
+                          <div class="w-full aspect-[2/3] bg-slate-900 rounded-lg overflow-hidden border border-slate-850 shadow-lg relative">
+                            <img src="\${fallbackImage}" alt="\${fallbackFilmTitle}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" referrerpolicy="no-referrer" />
+                          </div>
+                        </div>
+                        <div class="flex-grow space-y-3.5">
+                          <div class="space-y-1">
+                            <div class="flex flex-wrap items-baseline gap-2">
+                              <h4 class="text-sm font-black text-slate-100 tracking-tight leading-tight">\${fallbackFilmTitle}</h4>
+                              <span class="text-[10px] text-slate-500 font-mono">(\${fallbackYear})</span>
+                              <span class="text-[10px] text-slate-400 font-mono">• Dir: <span class="text-indigo-400 font-semibold">\${fallbackDirector}</span></span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                              <div class="text-[10px] text-slate-500 font-mono flex items-center gap-1 bg-slate-900/50 px-1.5 py-0.5 rounded border border-slate-850">
+                                <span class="text-slate-600">Avg Film Rating:</span>
+                                <span class="text-slate-350 font-bold">\${fallbackAvg}</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div class="text-xs text-slate-300 italic leading-relaxed border-l-2 border-indigo-500/40 pl-3 py-0.5 whitespace-pre-line select-text">
-                          "\\\${fallbackExcerpt}"
-                        </div>
-                        <div class="flex flex-wrap gap-1 pt-1">
-                          \\\${fallbackTags}
-                        </div>
-                        <div class="flex flex-wrap items-center justify-between gap-2 text-[9px] text-slate-500 font-mono pt-2 border-t border-slate-900/50">
-                          <div class="flex items-center gap-2">
-                            <span class="font-semibold text-slate-405">By \\\${opinionAuthorFallback}</span>
-                            <span class="text-slate-600">• Live Fallback</span>
-                            <span class="text-rose-400/90 bg-rose-950/30 px-1.5 py-0.5 rounded border border-rose-900/20 font-bold flex items-center gap-1">❤️ \\\${fallbackLikes}</span>
+                          <div class="text-xs text-slate-300 italic leading-relaxed border-l-2 border-indigo-500/40 pl-3 py-0.5 whitespace-pre-line select-text">
+                            "\${fallbackExcerpt}"
                           </div>
-                          <span class="text-[8px] bg-indigo-950/40 text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-900/30">Offline Mode</span>
+                          <div class="flex flex-wrap gap-1 pt-1">
+                            \${fallbackTags}
+                          </div>
+                          <div class="flex flex-wrap items-center justify-between gap-2 text-[9px] text-slate-500 font-mono pt-2 border-t border-slate-900/50">
+                            <div class="flex items-center gap-2">
+                              <span class="font-semibold text-slate-400 font-mono">By \${opinionAuthorFallback}</span>
+                              <span class="text-slate-600">• Live Fallback</span>
+                              <span class="text-rose-400/90 bg-rose-950/30 px-1.5 py-0.5 rounded border border-rose-900/20 font-bold flex items-center gap-1">❤️ \${fallbackLikes}</span>
+                            </div>
+                            <span class="text-[8px] bg-indigo-950/40 text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-900/30">Offline Mode</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  \`;
-                }
+                    \`;
+                  }
               })();
             </script>
           `;
