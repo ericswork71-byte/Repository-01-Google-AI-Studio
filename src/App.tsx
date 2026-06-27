@@ -255,13 +255,13 @@ export default function App() {
     }
 
     // Helper functions inside code generator to turn frame object into clean Tailwind blocks
-    const generateFrameHTML = (frame: FrameConfig, isUpper: boolean) => {
+    const generateFrameHTML = (frame: FrameConfig, isUpper: boolean, extraClasses = '') => {
       const paddingClass = frame.padding;
       const roundedClass = frame.borderStyle.includes('rounded-xl') ? 'rounded-xl' : frame.borderStyle.includes('rounded-none') ? 'rounded-none' : 'rounded-lg';
       const borderTheme = isUpper ? 'border-indigo-500' : 'border-slate-800';
       const bgTheme = frame.type === 'custom_html' ? 'bg-transparent' : 'bg-slate-900/60 backdrop-blur-md';
       
-      let flexBasis = isUpper ? 'max-w-2xl w-full mx-auto' : 'w-full';
+      let flexBasis = isUpper ? 'max-w-2xl w-full mx-auto' : 'w-full ' + extraClasses;
 
       let inner = ``;
       if (frame.type === 'content') {
@@ -428,20 +428,22 @@ export default function App() {
           inner = `
             <div id="${containerId}" class="space-y-4 text-left">
               <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-                <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                  <span class="text-[10px] font-mono font-bold text-amber-500 uppercase tracking-widest">${frame.title || "Featured Review"}</span>
+                <div class="flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-md shadow-indigo-500/50"></span>
+                  <span class="text-xs font-bold text-slate-100 tracking-tight uppercase font-mono">${frame.title || "Featured Reviews"}</span>
                 </div>
-                <span class="text-[9px] font-mono text-slate-650">Scraping Letterboxd...</span>
+                <span class="text-[9px] font-mono text-slate-500" id="${containerId}-status">Scraping Letterboxd...</span>
               </div>
               
-              <div class="animate-pulse flex items-center space-x-4 py-3">
-                <div class="bg-slate-850 h-24 w-16 rounded-md"></div>
-                <div class="flex-1 space-y-2 py-1">
-                  <div class="h-3 bg-slate-850 rounded w-3/4"></div>
-                  <div class="space-y-1">
-                    <div class="h-2 bg-slate-850 rounded"></div>
-                    <div class="h-2 bg-slate-850 rounded w-5/6"></div>
+              <div id="${containerId}-items" class="space-y-4">
+                <div class="animate-pulse flex items-center space-x-4 py-3">
+                  <div class="bg-slate-850 h-24 w-16 rounded-md"></div>
+                  <div class="flex-1 space-y-2 py-1">
+                    <div class="h-3 bg-slate-850 rounded w-3/4"></div>
+                    <div class="space-y-1">
+                      <div class="h-2 bg-slate-850 rounded"></div>
+                      <div class="h-2 bg-slate-850 rounded w-5/6"></div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -449,310 +451,257 @@ export default function App() {
 
             <script>
               (async function() {
-                const targetEl = document.getElementById("${containerId}");
-                const reviewUrl = "${frame.contentBody}";
-                try {
-                  const res = await fetch("/api/letterboxd-review?url=" + encodeURIComponent(reviewUrl));
-                  if (!res.ok) throw new Error();
-                  const data = await res.json();
-                  
-                  let opinionAuthor = "pirateneckbeard";
-                  let opinionFilm = "the train";
-                  try {
-                    let clean = reviewUrl.trim();
-                    while (clean.endsWith('/')) {
-                      clean = clean.slice(0, -1);
-                    }
-                    const parts = clean.split('/');
-                    if (parts.length > 3) {
-                      opinionAuthor = parts[3];
-                    }
-                    if (parts.length > 0) {
-                      const lastPart = parts[parts.length - 1];
-                      opinionFilm = lastPart.replace(/[-_]+/g, ' ');
-                    }
-                  } catch(err) {
-                    opinionAuthor = "pirateneckbeard";
-                    opinionFilm = "the train";
+                const targetEl = document.getElementById("${containerId}-items");
+                const statusEl = document.getElementById("${containerId}-status");
+                const rawUrl = \`${frame.contentBody}\`;
+                const urls = rawUrl.split(/[\\n,]+/).map(u => u.trim()).filter(u => u.length > 0 && (u.includes('letterboxd.com/') || u.includes('/film/')));
+                
+                if (urls.length === 0) {
+                  statusEl.textContent = "Offline 🔒";
+                  targetEl.innerHTML = '<div class="text-xs text-slate-500 italic">No valid Letterboxd URLs provided.</div>';
+                  return;
+                }
+
+                function parseReviewHtml(html, reviewUrl) {
+                  let title = "";
+                  const titleM = html.match(/<meta\\s+property=["']og:title["']\\s+content=["']([^"']+)["']/i) ||
+                                 html.match(/<meta\\s+content=["']([^"']+)["']\\s+property=["']og:title["']/i);
+                  if (titleM) {
+                    title = titleM[1];
+                  } else {
+                    const tM = html.match(/<title>([^<]+)<\\/title>/i);
+                    if (tM) title = tM[1];
                   }
 
-                  targetEl.innerHTML = \`
-                    <div class="flex items-start justify-between mb-3 pb-2 border-b border-slate-900/60">
-                      <div class="flex flex-col gap-0.5 text-left">
-                        <div class="flex items-center gap-1.5">
-                          <span class="w-2 h-2 rounded-full bg-amber-500 shadow shadow-amber-500/10"></span>
-                          <span class="text-[10px] font-mono font-bold text-amber-500 tracking-wider">🎥 An interested review of \${opinionFilm} by \${opinionAuthor}</span>
-                        </div>
-                        \${data.director ? \`<span class="text-xs font-bold text-slate-300 tracking-tight pl-3.5 block mt-0.5">Directed by \${data.director}</span>\` : ''}
-                      </div>
-                      <a href="\${data.link}" target="_blank" class="text-slate-500 hover:text-slate-350 text-[10px] font-mono flex items-center gap-1 transition">
-                        View Letterboxd <svg class="w-3 h-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                      </a>
-                    </div>
-                    
-                    <div class="flex flex-col sm:flex-row gap-4 items-start text-left">
-                      <div class="w-24 sm:w-28 flex-shrink-0 relative group">
-                        <div class="w-full aspect-[2/3] bg-slate-900 rounded-lg overflow-hidden border border-slate-850 shadow-lg relative">
-                          <img src="\${data.imageUrl}" alt="\${data.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" referrerpolicy="no-referrer" />
-                        </div>
-                      </div>
-                      <div class="flex-grow space-y-3.5">
-                        <div class="space-y-1">
-                          <div class="flex flex-wrap items-baseline gap-2">
-                             <h4 class="text-sm font-black text-slate-100 tracking-tight leading-tight">\${data.title.replace(/[★☆½]/g, "").replace(/\\s*-\\s*$/, "").trim()}</h4>
-                            <span class="text-[10px] text-slate-500 font-mono">(\${data.year || "1964"})</span>
-                            \${data.director ? \`<span class="text-[10px] text-slate-400 font-mono">• Dir: <span class="text-indigo-400 font-semibold">\${data.director}</span></span>\` : ''}
-                          </div>
-                          \${data.avgRating ? \`
-                          <div class="flex items-center gap-3">
-                            <div class="text-[10px] text-slate-500 font-mono flex items-center gap-1 bg-slate-900/50 px-1.5 py-0.5 rounded border border-slate-850"><span class="text-slate-600">Avg Film Rating:</span><span class="text-slate-350 font-bold">\${data.avgRating}</span></div>
-                          </div>
-                          \` : ''}
-                        </div>
-                        <div class="text-xs text-slate-300 italic leading-relaxed border-l-2 border-indigo-500/40 pl-3 py-0.5 whitespace-pre-line select-text">
-                          "\${data.reviewExcerpt}"
-                        </div>
-                        \${data.tags && data.tags.length > 0 ? \`
-                          <div class="flex flex-wrap gap-1 pt-1">
-                            \${data.tags.map(tag => \`<span class="text-[9px] bg-indigo-950/20 text-indigo-350 px-2 py-0.5 rounded-md border border-indigo-900/20 font-mono">#\${tag.replace(/\\s+/g, '-')}</span>\`).join('')}
-                          </div>
-                        \` : ''}
-                        <div class="flex flex-wrap items-center justify-between gap-2 text-[9px] text-slate-500 font-mono pt-2 border-t border-slate-900/50">
-                          <div class="flex items-center gap-2">
-                            <span class="font-semibold text-slate-405">By \${opinionAuthor}</span>
-                            \${data.datePublished ? \`<span class="text-slate-600">• \${data.datePublished}</span>\` : ''}
-                            \${data.likes ? \`<span class="text-rose-400/90 bg-rose-950/30 px-1.5 py-0.5 rounded border border-rose-900/20 font-bold flex items-center gap-1">❤️ \${data.likes}</span>\` : ''}
-                          </div>
-                          <span class="text-[8px] bg-indigo-950/40 text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-900/30">Parsed Live</span>
-                        </div>
-                      </div>
-                    </div>
-                  \`;
-                } catch(e) {
-                  // Try client-side parsing via corsproxy.io so it works beautifully on static GitHub Pages
+                  let filmTitle = title || "";
+                  let year = "1964";
+                  const yearM = title.match(/\\((\\d{4})\\)/);
+                  if (yearM) year = yearM[1];
+
+                  if (title.indexOf(" - review by ") !== -1) {
+                    filmTitle = title.split(" - review by ")[0].replace(/\\s*\\(\\d{4}\\)\\s*/g, "").trim();
+                  } else if (title.indexOf("’s review of ") !== -1) {
+                    filmTitle = title.split("’s review of ")[1].replace(/\\s*\\(\\d{4}\\)\\s*/g, "").trim();
+                  } else if (title.indexOf("'s review of ") !== -1) {
+                    filmTitle = title.split("'s review of ")[1].replace(/\\s*\\(\\d{4}\\)\\s*/g, "").trim();
+                  } else {
+                    filmTitle = title.replace(/\\s*\\(\\d{4}\\)\\s*/g, "").trim();
+                  }
+
+                  let imageUrl = "";
+                  const imgM = html.match(/<meta\\s+property=["']og:image["']\\s+content=["']([^"']+)["']/i) ||
+                               html.match(/<meta\\s+content=["']([^"']+)["']\\s+property=["']og:image["']/i);
+                  if (imgM) imageUrl = imgM[1];
+
+                  let ogDesc = "";
+                  const descM = html.match(/<meta\\s+property=["']og:description["']\\s+content=["']([^"']+)["']/i) ||
+                                html.match(/<meta\\s+name=["']description["']\\s+content=["']([^"']+)["']/i) ||
+                                html.match(/<meta\\s+content=["']([^"']+)["']\\s+property=["']og:description["']/i);
+                  if (descM) ogDesc = descM[1];
+
+                  let rating = "";
+                  const starsM = ogDesc.match(/[★☆½+]{1,6}/) || title.match(/[★☆½+]{1,6}/);
+                  if (starsM) rating = starsM[0];
+
+                  let director = "";
+                  const dirHrefMatch = html.match(/href="\\/director\\/([^/"]+)\\/"[^>]*>([^<]+)<\\/a>/i);
+                  if (dirHrefMatch) {
+                    director = dirHrefMatch[2].replace(/<[^>]+>/g, '').trim();
+                  }
+
+                  let avgRating = "";
+                  const avgAttrMatch = html.match(/data-average-rating="([^"]+)"/i);
+                  if (avgAttrMatch) {
+                    avgRating = parseFloat(avgAttrMatch[1]).toFixed(1) + " out of 5";
+                  }
+
+                  let reviewExcerpt = "";
+                  const reviewDivM = html.match(/<div\\s+class=["']review\\s+body-text\\s+-large["']>([\\s\\S]*?)<\\/div>/i) ||
+                                     html.match(/<div\\s+class=["']body-text\\s+-large\\s+review["']>([\\s\\S]*?)<\\/div>/i) ||
+                                     html.match(/<div\\s+class=["']review-body["']>([\\s\\S]*?)<\\/div>/i);
+                  if (reviewDivM) {
+                    reviewExcerpt = reviewDivM[1].replace(/<[^>]+>/g, " ").replace(/\\s+/g, " ").trim();
+                  } else {
+                    reviewExcerpt = ogDesc;
+                    if (reviewExcerpt.startsWith("Review by ")) {
+                      const colonIdx = reviewExcerpt.indexOf(":");
+                      if (colonIdx !== -1) reviewExcerpt = reviewExcerpt.substring(colonIdx + 1).trim();
+                    }
+                  }
+                  if (reviewExcerpt.length > 500) reviewExcerpt = reviewExcerpt.slice(0, 490) + "...";
+
+                  let likes = "";
+                  const likesM = html.match(/class=["']like-link-count["']>([\\s\\S]*?)(\\d+)/i) || html.match(/(\\d+)\\s+likes/i);
+                  if (likesM) likes = likesM[2] || likesM[1] || "";
+
+                  let opinionAuthor = "pirateneckbeard";
                   try {
-                    const corsUrl = "https://corsproxy.io/?" + encodeURIComponent(reviewUrl);
-                    const proxyRes = await fetch(corsUrl);
-                    if (!proxyRes.ok) throw new Error();
-                    const html = await proxyRes.text();
-                    
-                    let title = "";
-                    const titleM = html.match(/<meta\s+property=["']og:title["']\s+content=["']([^"']+)["']/i) ||
-                                   html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']og:title["']/i);
-                    if (titleM) {
-                      title = titleM[1];
-                    } else {
-                      const tM = html.match(/<title>([^<]+)<\/title>/i);
-                      if (tM) title = tM[1];
+                    let clean = reviewUrl.trim();
+                    while (clean.endsWith('/')) clean = clean.slice(0, -1);
+                    const parts = clean.split('/');
+                    if (parts.length > 3) opinionAuthor = parts[3];
+                  } catch(err) {}
+
+                  return {
+                    title: filmTitle,
+                    year: year,
+                    rating: rating,
+                    reviewExcerpt: reviewExcerpt,
+                    imageUrl: imageUrl,
+                    link: reviewUrl,
+                    director: director,
+                    avgRating: avgRating,
+                    likes: likes,
+                    opinionAuthor: opinionAuthor
+                  };
+                }
+
+                const parsedReviews = [];
+                let hasLive = false;
+
+                for (const u of urls) {
+                  let data = null;
+                  try {
+                    const res = await fetch("/api/letterboxd-review?url=" + encodeURIComponent(u));
+                    if (res.ok) {
+                      data = await res.json();
+                      let opinionAuthor = "pirateneckbeard";
+                      try {
+                        let clean = u.trim();
+                        while (clean.endsWith('/')) clean = clean.slice(0, -1);
+                        const parts = clean.split('/');
+                        if (parts.length > 3) opinionAuthor = parts[3];
+                      } catch(err) {}
+                      data.opinionAuthor = opinionAuthor;
+                      hasLive = true;
                     }
+                  } catch(e) {}
 
-                    let filmTitle = title || "";
-                    let year = "1964";
-                    const yearM = title.match(/\((\d{4})\)/);
-                    if (yearM) year = yearM[1];
-
-                    if (title.indexOf(" - review by ") !== -1) {
-                      filmTitle = title.split(" - review by ")[0].replace(/\s*\(\d{4}\)\s*/g, "").trim();
-                    } else if (title.indexOf("’s review of ") !== -1) {
-                      filmTitle = title.split("’s review of ")[1].replace(/\s*\(\d{4}\)\s*/g, "").trim();
-                    } else if (title.indexOf("'s review of ") !== -1) {
-                      filmTitle = title.split("'s review of ")[1].replace(/\s*\(\d{4}\)\s*/g, "").trim();
-                    } else {
-                      filmTitle = title.replace(/\s*\(\d{4}\)\s*/g, "").trim();
-                    }
-
-                    let imageUrl = "";
-                    const imgM = html.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i) ||
-                                 html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']og:image["']/i);
-                    if (imgM) imageUrl = imgM[1];
-
-                    let ogDesc = "";
-                    const descM = html.match(/<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']/i) ||
-                                  html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i) ||
-                                  html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']og:description["']/i);
-                    if (descM) ogDesc = descM[1];
-
-                    let rating = "";
-                    const starsM = ogDesc.match(/[★☆½+]{1,6}/) || title.match(/[★☆½+]{1,6}/);
-                    if (starsM) rating = starsM[0];
-
-                    let director = "";
-                    const dirHrefMatch = html.match(/href="\/director\/([^/"]+)\/"[^>]*>([^<]+)<\/a>/i);
-                    if (dirHrefMatch) {
-                      director = dirHrefMatch[2].replace(/<[^>]+>/g, '').trim();
-                    }
-
-                    let avgRating = "";
-                    const avgAttrMatch = html.match(/data-average-rating="([^"]+)"/i);
-                    if (avgAttrMatch) {
-                      avgRating = parseFloat(avgAttrMatch[1]).toFixed(1) + " out of 5";
-                    }
-
-                    let reviewExcerpt = "";
-                    const reviewDivM = html.match(/<div\s+class=["']review\s+body-text\s+-large["']>([\s\S]*?)<\/div>/i) ||
-                                       html.match(/<div\s+class=["']body-text\s+-large\s+review["']>([\s\S]*?)<\/div>/i) ||
-                                       html.match(/<div\s+class=["']review-body["']>([\s\S]*?)<\/div>/i);
-                    if (reviewDivM) {
-                      reviewExcerpt = reviewDivM[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-                    } else {
-                      reviewExcerpt = ogDesc;
-                      if (reviewExcerpt.startsWith("Review by ")) {
-                        const colonIdx = reviewExcerpt.indexOf(":");
-                        if (colonIdx !== -1) reviewExcerpt = reviewExcerpt.substring(colonIdx + 1).trim();
+                  if (!data) {
+                    try {
+                      const corsUrl = "https://corsproxy.io/?" + encodeURIComponent(u);
+                      const proxyRes = await fetch(corsUrl);
+                      if (proxyRes.ok) {
+                        const html = await proxyRes.text();
+                        data = parseReviewHtml(html, u);
+                        hasLive = true;
                       }
-                    }
-                    if (reviewExcerpt.length > 500) reviewExcerpt = reviewExcerpt.slice(0, 490) + "...";
+                    } catch(e) {}
+                  }
 
-                    let likes = "";
-                    const likesM = html.match(/class=["']like-link-count["']>([\s\S]*?)(\d+)/i) || html.match(/(\d+)\s+likes/i);
-                    if (likesM) likes = likesM[2] || likesM[1] || "";
+                  if (!data) {
+                    const isScanners = u.toLowerCase().includes('scanners');
+                    const fallbackDirector = isScanners ? "David Cronenberg" : "John Frankenheimer";
+                    const fallbackFilmTitle = isScanners ? "Scanners" : "The Train";
+                    const fallbackYear = isScanners ? "1981" : "1964";
+                    const fallbackAvg = isScanners ? "3.7 out of 5" : "4.1 out of 5";
+                    const fallbackExcerpt = isScanners 
+                      ? "David Cronenberg’s bizarre, fleshy sci-fi masterpiece is one of the ultimate body horror movies of the 1980s. The head-exploding scene is legendary, but the film's lasting power comes from its slow-burn corporate espionage tension."
+                      : "John Frankenheimer's masterpiece is one of the greatest war-action films ever made. Burt Lancaster is phenomenal in his physical commitment, carrying the heavy train machinery scenes with incredible realism.";
+                    const fallbackImage = isScanners
+                      ? "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=400&h=600&q=80"
+                      : "https://images.unsplash.com/photo-1542206395-9feb3edaa68d?auto=format&fit=crop&w=400&h=600&q=80";
+                    const fallbackLikes = isScanners ? "158" : "42";
+                    const fallbackRating = isScanners ? "★★★★" : "★★★★★";
+                    const fallbackTags = isScanners 
+                      ? ['horror', 'scifi']
+                      : ['wwii', 'masterpiece'];
 
                     let opinionAuthor = "pirateneckbeard";
                     try {
-                      let clean = reviewUrl.trim();
+                      let clean = u.trim();
                       while (clean.endsWith('/')) clean = clean.slice(0, -1);
                       const parts = clean.split('/');
                       if (parts.length > 3) opinionAuthor = parts[3];
                     } catch(err) {}
 
-                    targetEl.innerHTML = \`
-                      <div class="flex items-start justify-between mb-3 pb-2 border-b border-slate-900/60">
+                    data = {
+                      title: fallbackFilmTitle,
+                      year: fallbackYear,
+                      rating: fallbackRating,
+                      reviewExcerpt: fallbackExcerpt,
+                      imageUrl: fallbackImage,
+                      link: u,
+                      director: fallbackDirector,
+                      avgRating: fallbackAvg,
+                      likes: fallbackLikes,
+                      opinionAuthor: opinionAuthor,
+                      isOffline: true,
+                      tags: fallbackTags
+                    };
+                  }
+
+                  if (data) {
+                    parsedReviews.push(data);
+                  }
+                }
+
+                statusEl.textContent = hasLive ? "Live Sync 🟢" : "Offline Mode 🔒";
+
+                targetEl.innerHTML = parsedReviews.map(function(review) {
+                  const cleanTitle = review.title.replace(/[★☆½]/g, "").replace(/\\s*-\\s*$/, "").trim();
+                  let tagsHtml = "";
+                  if (review.tags && review.tags.length > 0) {
+                    tagsHtml = review.tags.map(function(tag) {
+                      return '<span class="text-[9px] bg-indigo-950/20 text-indigo-350 px-2 py-0.5 rounded-md border border-indigo-900/20 font-mono">#' + tag.replace(/\\s+/g, '-') + '</span>';
+                    }).join('');
+                  }
+
+                  return \`
+                    <div class="bg-slate-950/40 p-4 rounded-xl border border-slate-800/80 hover:border-indigo-500/40 transition-all duration-300">
+                      <div class="flex items-start justify-between mb-3 border-b border-slate-900/60 pb-2">
                         <div class="flex flex-col gap-0.5 text-left">
                           <div class="flex items-center gap-1.5">
                             <span class="w-2 h-2 rounded-full bg-amber-500 shadow shadow-amber-500/10"></span>
-                            <span class="text-[10px] font-mono font-bold text-amber-500 tracking-wider">🎥 A review of \\\${filmTitle} by \\\${opinionAuthor}</span>
+                            <span class="text-[10px] font-mono font-bold text-amber-500 tracking-wider uppercase">
+                              🎥 A review of \\\${cleanTitle} by \\\${review.opinionAuthor}
+                            </span>
                           </div>
-                          \\\${director ? \\\`<span class="text-xs font-bold text-slate-300 tracking-tight pl-3.5 block mt-0.5">Directed by \\\${director}</span>\\\` : ''}
                         </div>
-                        <a href="\\\${reviewUrl}" target="_blank" class="text-slate-500 hover:text-slate-350 text-[10px] font-mono flex items-center gap-1 transition">
-                          View Letterboxd <svg class="w-3 h-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                        <a href="\\\${review.link}" target="_blank" class="text-slate-500 hover:text-slate-350 text-[10px] font-mono flex items-center gap-1 transition">
+                          Open Letterboxd <svg class="w-3 h-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                         </a>
                       </div>
+
                       <div class="flex flex-col sm:flex-row gap-4 items-start text-left">
                         <div class="w-24 sm:w-28 flex-shrink-0 relative group">
                           <div class="w-full aspect-[2/3] bg-slate-900 rounded-lg overflow-hidden border border-slate-850 shadow-lg relative">
-                            <img src="\\\${imageUrl}" alt="\\\${filmTitle}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" referrerpolicy="no-referrer" />
+                            <img src="\\\${review.imageUrl}" alt="\\\${cleanTitle}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" referrerpolicy="no-referrer" />
                           </div>
                         </div>
                         <div class="flex-grow space-y-3.5">
                           <div class="space-y-1">
                             <div class="flex flex-wrap items-baseline gap-2">
-                              <h4 class="text-sm font-black text-slate-100 tracking-tight leading-tight">\\\${filmTitle.replace(/[★☆½]/g, "").trim()}</h4>
-                              <span class="text-[10px] text-slate-500 font-mono">(\\\${year})</span>
-                              \\\${director ? \\\`<span class="text-[10px] text-slate-400 font-mono">• Dir: <span class="text-indigo-400 font-semibold">\\\${director}</span></span>\\\` : ''}
+                              <h4 class="text-sm font-black text-slate-100 tracking-tight leading-tight">\\\${cleanTitle}</h4>
+                              <span class="text-[10px] text-slate-500 font-mono">(\\\${review.year})</span>
+                              \\\${review.director ? \\\`<span class="text-[10px] text-slate-400 font-mono">• Dir: <span class="text-indigo-400 font-semibold">\\\${review.director}</span></span>\\\` : ''}
                             </div>
-                            \\\${avgRating ? \\\`
+                            \\\${review.avgRating ? \\\`
                             <div class="flex items-center gap-3">
                               <div class="text-[10px] text-slate-500 font-mono flex items-center gap-1 bg-slate-900/50 px-1.5 py-0.5 rounded border border-slate-850">
                                 <span class="text-slate-600">Avg Film Rating:</span>
-                                <span class="text-slate-350 font-bold">\\\${avgRating}</span>
+                                <span class="text-slate-350 font-bold">\\\${review.avgRating}</span>
                               </div>
                             </div>
                             \\\` : ''}
                           </div>
                           <div class="text-xs text-slate-300 italic leading-relaxed border-l-2 border-indigo-500/40 pl-3 py-0.5 whitespace-pre-line select-text">
-                            "\\\${reviewExcerpt}"
+                            "\\\${review.reviewExcerpt}"
                           </div>
+                          \\\${tagsHtml ? \\\`<div class="flex flex-wrap gap-1 pt-1">\\\${tagsHtml}</div>\\\` : ''}
                           <div class="flex flex-wrap items-center justify-between gap-2 text-[9px] text-slate-500 font-mono pt-2 border-t border-slate-900/50">
                             <div class="flex items-center gap-2">
-                              <span class="font-semibold text-slate-400">By \\\${opinionAuthor}</span>
-                              \\\${rating ? \\\`<span class="text-amber-400 font-bold ml-1">\\\${rating}</span>\\\` : ''}
-                              \\\${likes ? \\\`<span class="text-rose-400/90 bg-rose-950/30 px-1.5 py-0.5 rounded border border-rose-900/20 font-bold flex items-center gap-1">❤️ \\\${likes}</span>\\\` : ''}
+                              <span class="font-semibold text-slate-400">By \\\${review.opinionAuthor}</span>
+                              \\\${review.rating ? \\\`<span class="text-amber-400 font-bold ml-1">\\\${review.rating}</span>\\\` : ''}
+                              \\\${review.likes ? \\\`<span class="text-rose-400/90 bg-rose-950/30 px-1.5 py-0.5 rounded border border-rose-900/20 font-bold flex items-center gap-1">❤️ \\\${review.likes}</span>\\\` : ''}
                             </div>
-                            <span class="text-[8px] bg-indigo-950/40 text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-900/30 font-mono">Parsed Live</span>
+                            <span class="text-[8px] bg-indigo-950/40 text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-900/30">\\\${review.isOffline ? 'Offline Mode' : 'Parsed Live'}</span>
                           </div>
                         </div>
                       </div>
-                    \`;
-                  } catch (proxyErr) {
-                    let opinionAuthorFallback = "pirateneckbeard";
-                    let opinionFilmFallback = "the train";
-                    try {
-                      let clean = reviewUrl.trim();
-                      while (clean.endsWith('/')) {
-                        clean = clean.slice(0, -1);
-                      }
-                      const parts = clean.split('/');
-                      if (parts.length > 3) {
-                        opinionAuthorFallback = parts[3];
-                      }
-                      if (parts.length > 0) {
-                        const lastPart = parts[parts.length - 1];
-                        opinionFilmFallback = lastPart.replace(/[-_]+/g, ' ');
-                      }
-                    } catch(err) {
-                      opinionAuthorFallback = "pirateneckbeard";
-                      opinionFilmFallback = "the train";
-                    }
-
-                    const isScannersFallback = reviewUrl.toLowerCase().includes('scanners');
-                    const fallbackDirector = isScannersFallback ? "David Cronenberg" : "John Frankenheimer";
-                    const fallbackFilmTitle = isScannersFallback ? "Scanners" : "The Train";
-                    const fallbackYear = isScannersFallback ? "1981" : "1964";
-                    const fallbackAvg = isScannersFallback ? "3.7 out of 5" : "4.1 out of 5";
-                    const fallbackExcerpt = isScannersFallback 
-                      ? "David Cronenberg’s bizarre, fleshy sci-fi masterpiece is one of the ultimate body horror movies of the 1980s. The head-exploding scene is legendary, but the film's lasting power comes from its slow-burn corporate espionage tension."
-                      : "John Frankenheimer's masterpiece is one of the greatest war-action films ever made. Burt Lancaster is phenomenal in his physical commitment, carrying the heavy train machinery scenes with incredible realism.";
-                    const fallbackImage = isScannersFallback
-                      ? "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=400&h=600&q=80"
-                      : "https://images.unsplash.com/photo-1542206395-9feb3edaa68d?auto=format&fit=crop&w=400&h=600&q=80";
-                    const fallbackLikes = isScannersFallback ? "158" : "42";
-                    const fallbackTags = isScannersFallback 
-                      ? '<span class="text-[9px] bg-indigo-950/20 text-indigo-350 px-2 py-0.5 rounded-md border border-indigo-900/20 font-mono">#horror</span><span class="text-[9px] bg-indigo-950/20 text-indigo-350 px-2 py-0.5 rounded-md border border-indigo-900/20 font-mono">#scifi</span>'
-                      : '<span class="text-[9px] bg-indigo-950/20 text-indigo-350 px-2 py-0.5 rounded-md border border-indigo-900/20 font-mono">#wwii</span><span class="text-[9px] bg-indigo-950/20 text-indigo-350 px-2 py-0.5 rounded-md border border-indigo-900/20 font-mono">#masterpiece</span>';
-
-                    targetEl.innerHTML = \`
-                      <div class="flex items-start justify-between mb-3 pb-2 border-b border-slate-900/60">
-                        <div class="flex flex-col gap-0.5 text-left">
-                          <div class="flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-amber-500 shadow shadow-amber-500/10"></span>
-                            <span class="text-[10px] font-mono font-bold text-amber-500 tracking-wider">🎥 An interested review of \${opinionFilmFallback} by \${opinionAuthorFallback}</span>
-                          </div>
-                          <span class="text-xs font-bold text-slate-300 tracking-tight pl-3.5 block mt-0.5">Directed by \${fallbackDirector}</span>
-                        </div>
-                        <a href="\${reviewUrl}" target="_blank" class="text-slate-500 hover:text-slate-200 text-[10px] font-mono flex items-center gap-1 transition">
-                          View Letterboxd <svg class="w-3 h-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                        </a>
-                      </div>
-                      
-                      <div class="flex flex-col sm:flex-row gap-4 items-start text-left">
-                        <div class="w-24 sm:w-28 flex-shrink-0 relative group">
-                          <div class="w-full aspect-[2/3] bg-slate-900 rounded-lg overflow-hidden border border-slate-850 shadow-lg relative">
-                            <img src="\${fallbackImage}" alt="\${fallbackFilmTitle}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" referrerpolicy="no-referrer" />
-                          </div>
-                        </div>
-                        <div class="flex-grow space-y-3.5">
-                          <div class="space-y-1">
-                            <div class="flex flex-wrap items-baseline gap-2">
-                              <h4 class="text-sm font-black text-slate-100 tracking-tight leading-tight">\${fallbackFilmTitle}</h4>
-                              <span class="text-[10px] text-slate-500 font-mono">(\${fallbackYear})</span>
-                              <span class="text-[10px] text-slate-400 font-mono">• Dir: <span class="text-indigo-400 font-semibold">\${fallbackDirector}</span></span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                              <div class="text-[10px] text-slate-500 font-mono flex items-center gap-1 bg-slate-900/50 px-1.5 py-0.5 rounded border border-slate-850">
-                                <span class="text-slate-600">Avg Film Rating:</span>
-                                <span class="text-slate-350 font-bold">\${fallbackAvg}</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="text-xs text-slate-300 italic leading-relaxed border-l-2 border-indigo-500/40 pl-3 py-0.5 whitespace-pre-line select-text">
-                            "\${fallbackExcerpt}"
-                          </div>
-                          <div class="flex flex-wrap gap-1 pt-1">
-                            \${fallbackTags}
-                          </div>
-                          <div class="flex flex-wrap items-center justify-between gap-2 text-[9px] text-slate-500 font-mono pt-2 border-t border-slate-900/50">
-                            <div class="flex items-center gap-2">
-                              <span class="font-semibold text-slate-400 font-mono">By \${opinionAuthorFallback}</span>
-                              <span class="text-slate-600">• Live Fallback</span>
-                              <span class="text-rose-400/90 bg-rose-950/30 px-1.5 py-0.5 rounded border border-rose-900/20 font-bold flex items-center gap-1">❤️ \${fallbackLikes}</span>
-                            </div>
-                            <span class="text-[8px] bg-indigo-950/40 text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-900/30">Offline Mode</span>
-                          </div>
-                        </div>
-                      </div>
-                    \`;
-                  }
+                    </div>
+                  \`;
+                }).join('<div class="h-px bg-slate-900/50 my-4"></div>');
               })();
             </script>
           `;
@@ -901,11 +850,11 @@ export default function App() {
       <div class="flex-grow h-px bg-slate-900"></div>
     </div>
 
-    <!-- LOWER THREE FRAMES (Horizontally aligned side-by-side) -->
-    <section class="max-w-4xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-      ${generateFrameHTML(lowerFrame1, false)}
-      ${generateFrameHTML(lowerFrame2, false)}
-      ${generateFrameHTML(lowerFrame3, false)}
+    <!-- LOWER THREE FRAMES (Rearranged Layout matching Live Preview) -->
+    <section class="max-w-4xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+      ${generateFrameHTML(lowerFrame1, false, "order-1 lg:order-1 lg:col-start-1 lg:row-start-1 lg:row-span-2 h-full")}
+      ${generateFrameHTML(lowerFrame3, false, "order-3 lg:order-2 lg:col-start-2 lg:row-start-1")}
+      ${generateFrameHTML(lowerFrame2, false, "order-2 lg:order-3 lg:col-start-2 lg:row-start-2")}
     </section>
 
     <footer class="text-center text-[11px] text-slate-500 border-t border-slate-900 pt-8 mt-4 space-y-1">
@@ -2567,11 +2516,11 @@ export default function App() {
                   <div className={`flex-grow h-px ${themeColor === 'editorial' ? 'bg-stone-200' : 'bg-slate-900'}`}></div>
                 </div>
 
-                {/* 3. THREE LOWER FRAMES (Side-by-side grid) */}
-                <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* 3. THREE LOWER FRAMES (Rearranged Layout) */}
+                <section className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                   
-                  {/* LOWER FRAME 1 */}
-                  <div className={`rounded-2xl p-6 border border-solid transition-all ${
+                  {/* SECOND FRAME (lowerFrame1 - Reviews) */}
+                  <div className={`rounded-2xl p-6 border border-solid transition-all order-1 lg:order-1 lg:col-start-1 lg:row-start-1 lg:row-span-2 h-full ${
                     themeColor === 'editorial' ? 'bg-stone-50 border-stone-200 shadow-sm' :
                     themeColor === 'emerald' ? 'bg-zinc-900 border-zinc-850' :
                     themeColor === 'sunset' ? 'bg-neutral-900 border-neutral-850' :
@@ -2635,81 +2584,8 @@ export default function App() {
                     )}
                   </div>
 
-                  {/* LOWER FRAME 2 */}
-                  <div className={`rounded-2xl p-6 border border-solid transition-all ${
-                    themeColor === 'editorial' ? 'bg-stone-50 border-stone-200 shadow-sm' :
-                    themeColor === 'emerald' ? 'bg-zinc-900 border-zinc-850' :
-                    themeColor === 'sunset' ? 'bg-neutral-900 border-neutral-850' :
-                    'bg-slate-900/60 border-slate-850 backdrop-blur shadow-2xl'
-                  }`}>
-                    {lowerFrame2.type === 'content' && (
-                      <div>
-                        {lowerFrame2.contentBody && lowerFrame2.contentBody.includes('ranking-of-film-releases-in-spain-in-2025') ? (
-                          <div className="space-y-2">
-                            <h4 className={`text-sm font-bold mb-2 ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame2.title}</h4>
-                            <LetterboxdSpainListLiveCard 
-                              sharedXml={sharedXml}
-                              sharedLoading={sharedLoading}
-                            />
-                          </div>
-                        ) : lowerFrame2.contentBody && (lowerFrame2.contentBody.includes('letterboxd.com/') || lowerFrame2.contentBody.includes('/film/')) ? (
-                          <LetterboxdReviewLiveCard url={lowerFrame2.contentBody} fallbackTitle={lowerFrame2.title} />
-                        ) : (
-                          <>
-                            <h4 className={`text-sm font-bold mb-2 ${themeColor === 'editorial' ? 'text-stone-900 font-serif' : 'text-white'}`}>{lowerFrame2.title}</h4>
-                            <p className={`text-xs whitespace-pre-line leading-relaxed ${themeColor === 'editorial' ? 'text-stone-700' : 'text-slate-300'}`}>{lowerFrame2.contentBody}</p>
-                          </>
-                        )}
-                      </div>
-                    )}
-                    {lowerFrame2.type === 'image' && (
-                      <div className="space-y-2">
-                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame2.title}</h4>
-                        <img src={lowerFrame2.imageUrl} alt="Lower Visual 2" className="w-full h-44 object-cover rounded-xl shadow-md border border-slate-800/10" />
-                        <p className={`text-xs ${themeColor === 'editorial' ? 'text-stone-600' : 'text-slate-400'}`}>{lowerFrame2.contentBody}</p>
-                      </div>
-                    )}
-                    {lowerFrame2.type === 'embed_tally' && (
-                      <div className="space-y-2">
-                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame2.title}</h4>
-                        <div className="w-full aspect-[16/9] rounded-xl overflow-hidden border border-slate-800 bg-slate-950">
-                          <iframe src={lowerFrame2.iframeUrl} width="100%" height="100%" frameBorder="0" title={lowerFrame2.title}>Loading...</iframe>
-                        </div>
-                      </div>
-                    )}
-                    {lowerFrame2.type === 'form' && (
-                      <div className="space-y-3">
-                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame2.title}</h4>
-                        <p className={`text-xs ${themeColor === 'editorial' ? 'text-stone-600' : 'text-slate-400'}`}>{lowerFrame2.contentBody}</p>
-                        <form onSubmit={handleMockSubmit} className="space-y-2">
-                          <input 
-                            type="email" 
-                            placeholder="Your email address..." 
-                            required
-                            className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none ${
-                              themeColor === 'editorial' 
-                                ? 'bg-white border-stone-300 text-stone-900 focus:border-stone-500' 
-                                : 'bg-slate-950 border-slate-800 text-white focus:border-indigo-500'
-                            }`} 
-                          />
-                          <button type="submit" className={`w-full text-[10px] font-bold py-2 rounded-lg uppercase tracking-wider transition-all ${
-                            themeColor === 'editorial' ? 'bg-[#4a3f35] text-amber-50 hover:bg-[#5c4f42]' : 'bg-indigo-600 text-white hover:bg-indigo-500'
-                          }`}>
-                            Send Info
-                          </button>
-                        </form>
-                      </div>
-                    )}
-                    {lowerFrame2.type === 'custom_html' && (
-                      <div className="space-y-2">
-                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame2.title}</h4>
-                        <div dangerouslySetInnerHTML={{ __html: lowerFrame2.contentBody }} />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* LOWER FRAME 3 */}
-                  <div className={`rounded-2xl p-6 border border-solid transition-all ${
+                  {/* FOURTH FRAME (lowerFrame3 - Visual / Info) */}
+                  <div className={`rounded-2xl p-6 border border-solid transition-all order-3 lg:order-2 lg:col-start-2 lg:row-start-1 ${
                     themeColor === 'editorial' ? 'bg-stone-50 border-stone-200 shadow-sm' :
                     themeColor === 'emerald' ? 'bg-zinc-900 border-zinc-850' :
                     themeColor === 'sunset' ? 'bg-neutral-900 border-neutral-850' :
@@ -2779,6 +2655,79 @@ export default function App() {
                       <div className="space-y-2">
                         <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame3.title}</h4>
                         <div dangerouslySetInnerHTML={{ __html: lowerFrame3.contentBody }} />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* THIRD FRAME (lowerFrame2 - Spain Film Releases) */}
+                  <div className={`rounded-2xl p-6 border border-solid transition-all order-2 lg:order-3 lg:col-start-2 lg:row-start-2 ${
+                    themeColor === 'editorial' ? 'bg-stone-50 border-stone-200 shadow-sm' :
+                    themeColor === 'emerald' ? 'bg-zinc-900 border-zinc-850' :
+                    themeColor === 'sunset' ? 'bg-neutral-900 border-neutral-850' :
+                    'bg-slate-900/60 border-slate-850 backdrop-blur shadow-2xl'
+                  }`}>
+                    {lowerFrame2.type === 'content' && (
+                      <div>
+                        {lowerFrame2.contentBody && lowerFrame2.contentBody.includes('ranking-of-film-releases-in-spain-in-2025') ? (
+                          <div className="space-y-2">
+                            <h4 className={`text-sm font-bold mb-2 ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame2.title}</h4>
+                            <LetterboxdSpainListLiveCard 
+                              sharedXml={sharedXml}
+                              sharedLoading={sharedLoading}
+                            />
+                          </div>
+                        ) : lowerFrame2.contentBody && (lowerFrame2.contentBody.includes('letterboxd.com/') || lowerFrame2.contentBody.includes('/film/')) ? (
+                          <LetterboxdReviewLiveCard url={lowerFrame2.contentBody} fallbackTitle={lowerFrame2.title} />
+                        ) : (
+                          <>
+                            <h4 className={`text-sm font-bold mb-2 ${themeColor === 'editorial' ? 'text-stone-900 font-serif' : 'text-white'}`}>{lowerFrame2.title}</h4>
+                            <p className={`text-xs whitespace-pre-line leading-relaxed ${themeColor === 'editorial' ? 'text-stone-700' : 'text-slate-300'}`}>{lowerFrame2.contentBody}</p>
+                          </>
+                        )}
+                      </div>
+                    )}
+                    {lowerFrame2.type === 'image' && (
+                      <div className="space-y-2">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame2.title}</h4>
+                        <img src={lowerFrame2.imageUrl} alt="Lower Visual 2" className="w-full h-44 object-cover rounded-xl shadow-md border border-slate-800/10" />
+                        <p className={`text-xs ${themeColor === 'editorial' ? 'text-stone-600' : 'text-slate-400'}`}>{lowerFrame2.contentBody}</p>
+                      </div>
+                    )}
+                    {lowerFrame2.type === 'embed_tally' && (
+                      <div className="space-y-2">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame2.title}</h4>
+                        <div className="w-full aspect-[16/9] rounded-xl overflow-hidden border border-slate-800 bg-slate-950">
+                          <iframe src={lowerFrame2.iframeUrl} width="100%" height="100%" frameBorder="0" title={lowerFrame2.title}>Loading...</iframe>
+                        </div>
+                      </div>
+                    )}
+                    {lowerFrame2.type === 'form' && (
+                      <div className="space-y-3">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame2.title}</h4>
+                        <p className={`text-xs ${themeColor === 'editorial' ? 'text-stone-600' : 'text-slate-400'}`}>{lowerFrame2.contentBody}</p>
+                        <form onSubmit={handleMockSubmit} className="space-y-2">
+                          <input 
+                            type="email" 
+                            placeholder="Your email address..." 
+                            required
+                            className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none ${
+                              themeColor === 'editorial' 
+                                ? 'bg-white border-stone-300 text-stone-900 focus:border-stone-500' 
+                                : 'bg-slate-950 border-slate-800 text-white focus:border-indigo-500'
+                            }`} 
+                          />
+                          <button type="submit" className={`w-full text-[10px] font-bold py-2 rounded-lg uppercase tracking-wider transition-all ${
+                            themeColor === 'editorial' ? 'bg-[#4a3f35] text-amber-50 hover:bg-[#5c4f42]' : 'bg-indigo-600 text-white hover:bg-indigo-500'
+                          }`}>
+                            Send Info
+                          </button>
+                        </form>
+                      </div>
+                    )}
+                    {lowerFrame2.type === 'custom_html' && (
+                      <div className="space-y-2">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame2.title}</h4>
+                        <div dangerouslySetInnerHTML={{ __html: lowerFrame2.contentBody }} />
                       </div>
                     )}
                   </div>
