@@ -48,7 +48,7 @@ interface FrameConfig {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'sandbox' | 'hosting-guide' | 'layout-theory' | 'live-view'>('sandbox');
+  const [activeTab, setActiveTab] = useState<'sandbox' | 'hosting-guide' | 'layout-theory' | 'live-view'>('live-view');
 
   // Centered Shared RSS Feed States to prevent duplicate network request overhead across components
   const [sharedXml, setSharedXml] = useState<string | null>(null);
@@ -681,7 +681,7 @@ export default function App() {
 
       return `
       <!-- Frame: ${frame.title} -->
-      <div class="${bgTheme} border border-slate-800 ${roundedClass} ${paddingClass} ${flexBasis} transition-all duration-300 group hover:border-indigo-500/50 shadow-lg">
+      <div class="${bgTheme} border ${borderTheme} ${roundedClass} ${paddingClass} ${flexBasis} transition-all duration-300 group hover:border-indigo-500/50 shadow-lg">
         ${inner}
       </div>`;
     };
@@ -732,7 +732,7 @@ export default function App() {
         <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Live Published Page
       </div>
       <h1 class="text-3xl font-black text-white tracking-tight">Another day dreaming</h1>
-      <p class="text-sm text-slate-400 max-w-md mx-auto">This responsive web page combines an upper centered frame with three vertically-stacked lower sections.</p>
+      <p class="text-sm text-slate-400 max-w-md mx-auto">This responsive web page combines an upper centered frame with three lower sections arranged side-by-side.</p>
     </header>
 
     <!-- UPPER ROW (Occupies the Middle section horizontally) -->
@@ -741,14 +741,14 @@ export default function App() {
     </section>
 
     <!-- DIVISION SEPARATOR -->
-    <div class="w-full max-w-xl mx-auto flex items-center gap-3">
+    <div class="w-full max-w-2xl mx-auto flex items-center gap-3">
       <div class="flex-grow h-px bg-slate-900"></div>
-      <span class="text-[10px] font-mono text-slate-600 uppercase tracking-widest">Vertically Stacked Stack</span>
+      <span class="text-[10px] font-mono text-slate-600 uppercase tracking-widest">Lower Stack Elements Grid</span>
       <div class="flex-grow h-px bg-slate-900"></div>
     </div>
 
-    <!-- LOWER THREE FRAMES (Vertically aligned, same sizing dimensions) -->
-    <section class="max-w-xl w-full mx-auto flex flex-col gap-6">
+    <!-- LOWER THREE FRAMES (Horizontally aligned side-by-side) -->
+    <section class="max-w-4xl w-full mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
       ${generateFrameHTML(lowerFrame1, false)}
       ${generateFrameHTML(lowerFrame2, false)}
       ${generateFrameHTML(lowerFrame3, false)}
@@ -1795,14 +1795,14 @@ export default function App() {
                         </div>
 
                         {/* spacer */}
-                        <div className="flex items-center gap-2 max-w-lg mx-auto">
+                        <div className="flex items-center gap-2 max-w-2xl mx-auto">
                           <div className="h-px bg-slate-800 flex-grow"></div>
-                          <span className="text-[9px] text-slate-600 font-mono uppercase tracking-widest">Stack Element Grid</span>
+                          <span className="text-[9px] text-slate-600 font-mono uppercase tracking-widest">Lower Stack Elements Grid</span>
                           <div className="h-px bg-slate-800 flex-grow"></div>
                         </div>
 
-                        {/* THREE LOWER VERTICAL FRAMES */}
-                        <div className="max-w-lg mx-auto w-full flex flex-col gap-4">
+                        {/* THREE LOWER GRID FRAMES */}
+                        <div className="max-w-2xl mx-auto w-full grid grid-cols-1 sm:grid-cols-3 gap-4">
                           
                           {/* FRAME 1 */}
                           <div className="w-full bg-slate-900/60 p-4 rounded-xl border border-slate-800 hover:border-indigo-500/40 transition-all">
@@ -2289,7 +2289,7 @@ export default function App() {
             </div>
 
             {/* Pristine 4-Frame Webpage Stage */}
-            <div className="flex-grow py-12 px-4 md:px-6 max-w-3xl mx-auto w-full relative">
+            <div className="flex-grow py-12 px-4 md:px-8 max-w-5xl mx-auto w-full relative">
               
               {/* Subtle Ambient Radial Glow */}
               {themeColor !== 'editorial' && (
@@ -2316,13 +2316,13 @@ export default function App() {
                   <p className={`text-xs max-w-md mx-auto ${
                     themeColor === 'editorial' ? 'text-stone-600' : 'text-slate-400'
                   }`}>
-                    This responsive web page combines an upper centered frame with three vertically-stacked lower sections.
+                    This responsive web page combines an upper centered frame with three lower sections arranged side-by-side.
                   </p>
                 </header>
 
                 {/* 2. UPPER CENTERED FRAME CONTAINER */}
                 <section className="w-full flex justify-center">
-                  <div className={`w-full ${
+                  <div className={`w-full max-w-2xl mx-auto ${
                     upperFrame.type === 'letterboxd_carousel' 
                       ? 'bg-transparent' 
                       : `rounded-2xl p-6 border border-solid ${
@@ -2403,16 +2403,16 @@ export default function App() {
                 </section>
 
                 {/* Division Divider */}
-                <div className="w-full max-w-xl mx-auto flex items-center gap-3">
+                <div className="w-full max-w-3xl mx-auto flex items-center gap-3">
                   <div className={`flex-grow h-px ${themeColor === 'editorial' ? 'bg-stone-200' : 'bg-slate-900'}`}></div>
                   <span className={`text-[9px] uppercase tracking-widest font-semibold ${themeColor === 'editorial' ? 'text-stone-400' : 'text-slate-600'}`}>
-                    Featured Stack
+                    Lower Stack Elements Grid
                   </span>
                   <div className={`flex-grow h-px ${themeColor === 'editorial' ? 'bg-stone-200' : 'bg-slate-900'}`}></div>
                 </div>
 
-                {/* 3. THREE LOWER VERTICAL STACKED FRAMES */}
-                <section className="w-full flex flex-col gap-8">
+                {/* 3. THREE LOWER FRAMES (Side-by-side grid) */}
+                <section className="w-full grid grid-cols-1 sm:grid-cols-3 gap-6">
                   
                   {/* LOWER FRAME 1 */}
                   <div className={`rounded-2xl p-6 border border-solid transition-all ${
