@@ -28,7 +28,9 @@ import {
   RefreshCw,
   Plus,
   Trash2,
-  AlignJustify
+  AlignJustify,
+  FolderArchive,
+  FolderDown
 } from 'lucide-react';
 
 // Interfaces for our 4-Frame Sandbox
@@ -127,6 +129,11 @@ export default function App() {
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [activeCodeTab, setActiveCodeTab] = useState<'html' | 'css'>('html');
   const [copiedCode, setCopiedCode] = useState<boolean>(false);
+
+  // Zip Export States
+  const [zipLoading, setZipLoading] = useState<boolean>(false);
+  const [zipSuccess, setZipSuccess] = useState<boolean>(false);
+  const [zipError, setZipError] = useState<string | null>(null);
 
   // Layout Theme State
   const [themeColor, setThemeColor] = useState<'slate' | 'editorial' | 'emerald' | 'sunset'>('slate');
@@ -1066,6 +1073,46 @@ export default function App() {
     URL.revokeObjectURL(downloadURL);
   };
 
+  const handleExportZipFile = async () => {
+    setZipLoading(true);
+    setZipSuccess(false);
+    setZipError(null);
+
+    try {
+      const response = await fetch('/api/export-zip', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customHtml: getFullCode()
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Export service returned an error response.');
+      }
+
+      const blob = await response.blob();
+      const downloadURL = URL.createObjectURL(blob);
+      const downloadLink = document.createElement('a');
+      downloadLink.href = downloadURL;
+      downloadLink.download = 'centered-4frame-design-export.zip';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      URL.revokeObjectURL(downloadURL);
+
+      setZipSuccess(true);
+      setTimeout(() => setZipSuccess(false), 4000);
+    } catch (err: any) {
+      console.error('[ExportZip] Error exporting ZIP file:', err);
+      setZipError(err.message || 'Could not generate ZIP archive.');
+    } finally {
+      setZipLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-600 selection:text-white">
       
@@ -1487,6 +1534,56 @@ export default function App() {
 
               </div>
 
+              {/* Export Full Codebase & Assets Section */}
+              <div className="pt-5 border-t border-slate-800 space-y-3">
+                <div className="flex items-center gap-2">
+                  <FolderArchive className="w-4 h-4 text-indigo-400" />
+                  <span className="text-xs font-bold text-white uppercase tracking-wider font-mono">Export Offline Project Package</span>
+                </div>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Export the entire custom 4-frame design bundled alongside the development source files, configurations, and API proxies as a single downloadable ZIP.
+                </p>
+
+                <div className="space-y-2">
+                  <button
+                    onClick={handleExportZipFile}
+                    disabled={zipLoading}
+                    className={`w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition-all border border-solid ${
+                      zipSuccess 
+                        ? 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-950/20'
+                        : 'bg-indigo-600 hover:bg-indigo-500 text-white border-indigo-500 shadow-lg shadow-indigo-950/20'
+                    } disabled:opacity-60 disabled:cursor-not-allowed`}
+                  >
+                    {zipLoading ? (
+                      <RefreshCw className="w-4 h-4 animate-spin text-white" />
+                    ) : zipSuccess ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+                    ) : (
+                      <FolderDown className="w-4 h-4 text-indigo-200" />
+                    )}
+                    <span>
+                      {zipLoading ? 'Preparing Code Package...' : zipSuccess ? 'ZIP Package Downloaded!' : 'Download Complete ZIP Package'}
+                    </span>
+                  </button>
+
+                  {zipSuccess && (
+                    <div className="p-2.5 bg-emerald-950/50 border border-emerald-500/30 rounded-lg text-center animate-pulse">
+                      <p className="text-[10px] text-emerald-400 font-medium">
+                        ✨ ZIP generation complete! Check your browser downloads for <strong>centered-4frame-design-export.zip</strong>.
+                      </p>
+                    </div>
+                  )}
+
+                  {zipError && (
+                    <div className="p-2.5 bg-red-950/50 border border-red-500/30 rounded-lg text-center">
+                      <p className="text-[10px] text-red-400 font-medium">
+                        ❌ Error generating ZIP: {zipError}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
             </div>
 
             {/* RIGHT WORKSPACE PREVIEW & CODE PANEL */}
@@ -1515,21 +1612,43 @@ export default function App() {
                   </button>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <button
                     onClick={handleCopyCode}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs bg-slate-950 hover:bg-slate-800 border border-slate-800 transition"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs bg-slate-950 hover:bg-slate-800 border border-slate-800 transition text-slate-300"
+                    title="Copy full self-contained index.html source code"
                   >
                     {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-indigo-400" />}
-                    <span>{copiedCode ? 'Copied to Clipboard!' : 'Copy index.html code'}</span>
+                    <span>{copiedCode ? 'Copied' : 'Copy HTML'}</span>
                   </button>
 
                   <button
                     onClick={handleDownloadCodeFile}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs bg-indigo-600 hover:bg-indigo-500 font-bold transition"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs bg-slate-950 hover:bg-slate-800 border border-slate-800 transition text-slate-300"
+                    title="Download individual self-contained index.html file"
                   >
-                    <Download className="w-3.5 h-3.5" />
-                    Download File
+                    <Download className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Download HTML</span>
+                  </button>
+
+                  <button
+                    onClick={handleExportZipFile}
+                    disabled={zipLoading}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-solid ${
+                      zipSuccess 
+                        ? 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500 shadow-md shadow-emerald-950/10'
+                        : 'bg-indigo-600 hover:bg-indigo-500 text-white border-indigo-500 shadow-md shadow-indigo-950/10'
+                    } disabled:opacity-60 disabled:cursor-not-allowed`}
+                    title="Export the entire custom 4-frame design along with all developer source files and configuration into a single ZIP file"
+                  >
+                    {zipLoading ? (
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
+                    ) : zipSuccess ? (
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-200" />
+                    ) : (
+                      <FolderArchive className="w-3.5 h-3.5 text-indigo-200" />
+                    )}
+                    <span>{zipLoading ? 'Bundling...' : zipSuccess ? 'Downloaded!' : 'Export ZIP'}</span>
                   </button>
                 </div>
               </div>

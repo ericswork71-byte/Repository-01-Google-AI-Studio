@@ -1,10 +1,16 @@
 import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
+import JSZip from 'jszip';
+import fs from 'fs';
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
+
+  // Configure JSON body parser middleware with generous limits for custom HTML source code payloads
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
   // Helper function to generate high-quality fallback XML feeds for Letterboxd profiles or lists in case of 403 or server blockages
   function generateFallbackXML(url: string): string {
@@ -739,6 +745,94 @@ ${itemsXml}
         datePublished: "Aug 24, 2023",
         tags: ["wwii", "masterpiece", "tension", "trains", "celluloid", "john frankenheimer"]
       });
+    }
+  });
+
+  // 3. Centralized Export-ZIP Endpoint to bundle the entire project source code and current design assets
+  app.post('/api/export-zip', async (req, res) => {
+    try {
+      const { customHtml } = req.body;
+      const zip = new JSZip();
+      const rootDir = process.cwd();
+
+      // Recursive helper to read and compress workspace directories
+      const addFilesRecursively = (currentDir: string, zipFolder: JSZip) => {
+        const items = fs.readdirSync(currentDir);
+        for (const item of items) {
+          const fullPath = path.join(currentDir, item);
+          const stat = fs.statSync(fullPath);
+
+          // Exclude generated build files and node dependencies
+          if (
+            item === 'node_modules' ||
+            item === 'dist' ||
+            item === '.git' ||
+            item === '.cache' ||
+            item === 'package-lock.json' ||
+            item === '.DS_Store'
+          ) {
+            continue;
+          }
+
+          if (stat.isDirectory()) {
+            const nestedFolder = zipFolder.folder(item);
+            if (nestedFolder) {
+              addFilesRecursively(fullPath, nestedFolder);
+            }
+          } else {
+            // Replace standard root index.html with the dynamically-generated version
+            if (item === 'index.html' && currentDir === rootDir) {
+              zipFolder.file(item, customHtml || fs.readFileSync(fullPath, 'utf8'));
+            } else {
+              const fileBuffer = fs.readFileSync(fullPath);
+              zipFolder.file(item, fileBuffer);
+            }
+          }
+        }
+      };
+
+      // Traverse root directory and add to JSZip
+      addFilesRecursively(rootDir, zip);
+
+      // Add a clean README file in the root explaining how to use the zip
+      zip.file("README.md", `# 🎬 Centered 4-Frame Web App Sandbox
+
+Congratulations! You have exported your custom Centered 4-Frame Web App Design.
+
+## 📁 What's Inside This Export?
+
+1. **\`index.html\`**: The fully compiled, offline-ready, responsive HTML5 version of your custom 4-Frame page. You can double-click this file to open it in any web browser instantly!
+2. **Full Source Code**:
+   - **\`src/\`**: Active React components, custom layout styles, and data states.
+   - **\`server.ts\`**: Express backend containing robust CORS proxies to bypass Letterboxd platform rate limits safely.
+   - **\`package.json\`**: NPM dependency specifications.
+
+## 🚀 How to Run the Developer Sandbox Locally
+
+1. Make sure you have **Node.js** installed on your machine.
+2. Open a terminal or command prompt in this directory.
+3. Install dependencies:
+   \`\`\`bash
+   npm install
+   \`\`\`
+4. Run the local development server:
+   \`\`\`bash
+   npm run dev
+   \`\`\`
+5. Open your browser and navigate to **http://localhost:3000** to view your local sandbox!
+`);
+
+      // Generate the ZIP as a Node.js buffer
+      const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
+
+      // Set download headers
+      res.setHeader('Content-Type', 'application/zip');
+      res.setHeader('Content-Disposition', 'attachment; filename="centered-4frame-design-export.zip"');
+      res.send(zipBuffer);
+
+    } catch (err: any) {
+      console.error("[ExportZip] Error generating project ZIP archive:", err);
+      res.status(500).json({ error: "Failed to generate download ZIP archive.", details: err.message });
     }
   });
 
