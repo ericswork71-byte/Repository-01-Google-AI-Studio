@@ -48,7 +48,7 @@ interface FrameConfig {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'sandbox' | 'hosting-guide' | 'layout-theory'>('sandbox');
+  const [activeTab, setActiveTab] = useState<'sandbox' | 'hosting-guide' | 'layout-theory' | 'live-view'>('sandbox');
 
   // Centered Shared RSS Feed States to prevent duplicate network request overhead across components
   const [sharedXml, setSharedXml] = useState<string | null>(null);
@@ -1116,65 +1116,80 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-600 selection:text-white">
       
-      {/* Visual Navigation Banner */}
-      <header className="bg-slate-950 border-b border-slate-900/60 p-5 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-0 z-50 backdrop-blur-md bg-opacity-95">
-        <div className="flex items-center gap-3">
-          <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 p-2.5 rounded-xl shadow-lg shadow-indigo-500/10">
-            <Layout className="w-5 h-5 text-white animate-pulse" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-md font-extrabold tracking-tight text-white md:text-lg">Another day dreaming Sandbox</h1>
-              <span className="bg-indigo-950/80 text-indigo-400 text-[10px] font-mono px-2 py-0.5 rounded-full border border-indigo-900/30">
-                100% Free
-              </span>
+      {/* Visual Navigation Banner (Hidden in Live Webpage Mode for direct pristine preview) */}
+      {activeTab !== 'live-view' && (
+        <header className="bg-slate-950 border-b border-slate-900/60 p-5 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-0 z-50 backdrop-blur-md bg-opacity-95">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 p-2.5 rounded-xl shadow-lg shadow-indigo-500/10">
+              <Layout className="w-5 h-5 text-white animate-pulse" />
             </div>
-            <p className="text-xs text-slate-400">Interactive sandbox to design, test, and publish a premium 4-Frame centered web page at zero cost.</p>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-md font-extrabold tracking-tight text-white md:text-lg">Another day dreaming Sandbox</h1>
+                <span className="bg-indigo-950/80 text-indigo-400 text-[10px] font-mono px-2 py-0.5 rounded-full border border-indigo-900/30">
+                  100% Free
+                </span>
+              </div>
+              <p className="text-xs text-slate-400">Interactive sandbox to design, test, and publish a premium 4-Frame centered web page at zero cost.</p>
+            </div>
           </div>
-        </div>
 
-        {/* Dynamic Navigation Mode */}
-        <div className="flex bg-slate-900 p-1 rounded-xl border border-slate-800 self-stretch md:self-auto">
-          <button
-            onClick={() => setActiveTab('sandbox')}
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
-              activeTab === 'sandbox'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Layers className="w-3.5 h-3.5" />
-            Live 4-Frame Sandbox
-          </button>
-          
-          <button
-            onClick={() => setActiveTab('hosting-guide')}
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
-              activeTab === 'hosting-guide'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Globe className="w-3.5 h-3.5" />
-            Zero-Cost Publishing Guide
-          </button>
+          {/* Dynamic Navigation Mode */}
+          <div className="flex flex-wrap bg-slate-900 p-1 rounded-xl border border-slate-800 gap-1 self-stretch md:self-auto">
+            <button
+              onClick={() => setActiveTab('sandbox')}
+              className={`flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
+                activeTab === 'sandbox'
+                  ? 'bg-indigo-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              Live 4-Frame Sandbox
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('hosting-guide')}
+              className={`flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
+                activeTab === 'hosting-guide'
+                  ? 'bg-indigo-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Globe className="w-3.5 h-3.5" />
+              Zero-Cost Publishing Guide
+            </button>
 
-          <button
-            onClick={() => setActiveTab('layout-theory')}
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
-              activeTab === 'layout-theory'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <BookOpen className="w-3.5 h-3.5" />
-            Layout &amp; Form School
-          </button>
-        </div>
-      </header>
+            <button
+              onClick={() => setActiveTab('layout-theory')}
+              className={`flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
+                activeTab === 'layout-theory'
+                  ? 'bg-indigo-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              Layout &amp; Form School
+            </button>
+
+            <button
+              onClick={() => setActiveTab('live-view')}
+              className={`flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-lg transition-all border border-solid ${
+                activeTab === 'live-view'
+                  ? 'bg-emerald-600 text-white border-emerald-500'
+                  : 'bg-emerald-950/30 text-emerald-400 hover:bg-emerald-900/20 border-emerald-900/30'
+              }`}
+              title="View only your custom webpage in absolute full glory without sidebars or controls"
+            >
+              <Globe className="w-3.5 h-3.5 animate-pulse text-emerald-200" />
+              🌐 Pure Webpage Only
+            </button>
+          </div>
+        </header>
+      )}
 
       {/* Main Sandbox Interactive Workspace */}
-      <main className="flex-grow p-4 md:p-6 max-w-[1600px] w-full mx-auto grid grid-cols-1 gap-6">
+      <main className={`${activeTab === 'live-view' ? 'p-0 max-w-none w-full flex-grow' : 'flex-grow p-4 md:p-6 max-w-[1600px] w-full mx-auto grid grid-cols-1 gap-6'}`}>
 
         {activeTab === 'sandbox' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -2229,19 +2244,430 @@ export default function App() {
           </div>
         )}
 
+        {/* TAB 4: PRISTINE LIVE WEBPAGE PREVIEW MODE (No developer sidebars, tools, or annotations) */}
+        {activeTab === 'live-view' && (
+          <div className={`min-h-screen flex flex-col w-full ${
+            themeColor === 'editorial' ? 'bg-[#fcfaf7] text-stone-900 font-serif' :
+            themeColor === 'emerald' ? 'bg-zinc-950 text-zinc-100 font-mono' :
+            themeColor === 'sunset' ? 'bg-neutral-950 text-neutral-100' :
+            'bg-slate-950 text-slate-100 font-sans'
+          }`}>
+            {/* Elegant Sticky Preview Action Bar */}
+            <div className="bg-slate-950 border-b border-slate-900 px-4 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-xl backdrop-blur-md bg-opacity-95">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping inline-block"></span>
+                <span className="text-xs font-mono font-bold text-slate-300">LIVE WEBSITE DEMO</span>
+                <span className="text-[10px] text-slate-500 hidden sm:inline">
+                  | Experiencing your custom 4-frame design exactly as a visitor sees it
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleCopyCode}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-all font-semibold"
+                  title="Copy full single-file index.html code"
+                >
+                  {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-indigo-400" />}
+                  <span>{copiedCode ? 'Copied HTML!' : 'Copy Page Code'}</span>
+                </button>
+                <button
+                  onClick={handleExportZipFile}
+                  disabled={zipLoading}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs bg-indigo-600 hover:bg-indigo-500 text-white transition-all font-bold disabled:opacity-60"
+                  title="Export complete web server packages & source files in ZIP"
+                >
+                  {zipLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <FolderArchive className="w-3.5 h-3.5 text-indigo-200" />}
+                  <span>{zipLoading ? 'Bundling...' : 'Download ZIP Package'}</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('sandbox')}
+                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold transition-all shadow-lg shadow-emerald-950/20"
+                >
+                  <span>✏️ Open Sandbox Editor</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Pristine 4-Frame Webpage Stage */}
+            <div className="flex-grow py-12 px-4 md:px-6 max-w-3xl mx-auto w-full relative">
+              
+              {/* Subtle Ambient Radial Glow */}
+              {themeColor !== 'editorial' && (
+                <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.06),transparent_50%)]"></div>
+              )}
+
+              <div className="space-y-12">
+                
+                {/* 1. Brand Site Header */}
+                <header className="text-center space-y-2 mb-10">
+                  <span className={`text-[9px] uppercase tracking-widest font-mono border px-3 py-1 rounded-full inline-block ${
+                    themeColor === 'editorial' ? 'text-stone-700 border-stone-300 bg-stone-100' :
+                    themeColor === 'emerald' ? 'text-emerald-400 border-emerald-900 bg-emerald-950/30' :
+                    themeColor === 'sunset' ? 'text-orange-400 border-orange-950 bg-orange-950/30' :
+                    'text-indigo-400 border-indigo-900 bg-indigo-950/30'
+                  }`}>
+                    Cinema &amp; Review Journal
+                  </span>
+                  <h1 className={`text-2xl md:text-3xl font-extrabold tracking-tight ${
+                    themeColor === 'editorial' ? 'text-stone-900 font-serif' : 'text-white font-sans'
+                  }`}>
+                    Another day dreaming
+                  </h1>
+                  <p className={`text-xs max-w-md mx-auto ${
+                    themeColor === 'editorial' ? 'text-stone-600' : 'text-slate-400'
+                  }`}>
+                    This responsive web page combines an upper centered frame with three vertically-stacked lower sections.
+                  </p>
+                </header>
+
+                {/* 2. UPPER CENTERED FRAME CONTAINER */}
+                <section className="w-full flex justify-center">
+                  <div className={`w-full ${
+                    upperFrame.type === 'letterboxd_carousel' 
+                      ? 'bg-transparent' 
+                      : `rounded-2xl p-6 border border-solid ${
+                          themeColor === 'editorial' ? 'bg-stone-50 border-stone-200 shadow-sm' :
+                          themeColor === 'emerald' ? 'bg-zinc-900 border-zinc-850' :
+                          themeColor === 'sunset' ? 'bg-neutral-900 border-neutral-850' :
+                          'bg-slate-900/60 border-slate-850 backdrop-blur shadow-2xl'
+                        }`
+                  }`}>
+                    {upperFrame.type === 'letterboxd_carousel' && (
+                      <LetterboxdCarousel 
+                        feedUrl={upperFrame.contentBody} 
+                        themeColor={themeColor}
+                        sharedXml={sharedXml}
+                        sharedLoading={sharedLoading}
+                        sharedError={sharedError}
+                        sharedIsReal={sharedIsReal}
+                      />
+                    )}
+
+                    {upperFrame.type === 'content' && (
+                      <div className="space-y-1">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{upperFrame.title}</h4>
+                        <p className={`text-xs whitespace-pre-line leading-relaxed ${themeColor === 'editorial' ? 'text-stone-700' : 'text-slate-300'}`}>{upperFrame.contentBody}</p>
+                      </div>
+                    )}
+
+                    {upperFrame.type === 'image' && (
+                      <div className="space-y-2">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{upperFrame.title}</h4>
+                        <img src={upperFrame.imageUrl} alt="Visual Media" className="w-full h-44 object-cover rounded-xl shadow-md border border-slate-800/20" />
+                        <p className={`text-xs ${themeColor === 'editorial' ? 'text-stone-600' : 'text-slate-400'}`}>{upperFrame.contentBody}</p>
+                      </div>
+                    )}
+
+                    {upperFrame.type === 'embed_tally' && (
+                      <div className="space-y-2">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{upperFrame.title}</h4>
+                        <div className="w-full aspect-[4/3] rounded-xl overflow-hidden border border-slate-800 bg-slate-950">
+                          <iframe src={upperFrame.iframeUrl} width="100%" height="100%" frameBorder="0" title={upperFrame.title}>Loading...</iframe>
+                        </div>
+                      </div>
+                    )}
+
+                    {upperFrame.type === 'form' && (
+                      <div className="space-y-3">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{upperFrame.title}</h4>
+                        <p className={`text-xs ${themeColor === 'editorial' ? 'text-stone-600' : 'text-slate-400'}`}>{upperFrame.contentBody}</p>
+                        <form onSubmit={handleMockSubmit} className="space-y-2">
+                          <input 
+                            type="email" 
+                            placeholder="Your email address here..." 
+                            required
+                            value={newsletterEmail}
+                            onChange={(e) => setNewsletterEmail(e.target.value)}
+                            className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none transition-all ${
+                              themeColor === 'editorial' 
+                                ? 'bg-white border-stone-300 text-stone-900 focus:border-stone-500' 
+                                : 'bg-slate-950 border-slate-800 text-white focus:border-indigo-500'
+                            }`} 
+                          />
+                          <button type="submit" className={`w-full text-[10px] font-bold py-2 rounded-lg uppercase tracking-wider transition-all ${
+                            themeColor === 'editorial' ? 'bg-[#4a3f35] text-amber-50 hover:bg-[#5c4f42]' : 'bg-indigo-600 text-white hover:bg-indigo-500'
+                          }`}>
+                            Send Submission
+                          </button>
+                        </form>
+                      </div>
+                    )}
+
+                    {upperFrame.type === 'custom_html' && (
+                      <div className="space-y-2">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{upperFrame.title}</h4>
+                        <div dangerouslySetInnerHTML={{ __html: upperFrame.contentBody }} />
+                      </div>
+                    )}
+                  </div>
+                </section>
+
+                {/* Division Divider */}
+                <div className="w-full max-w-xl mx-auto flex items-center gap-3">
+                  <div className={`flex-grow h-px ${themeColor === 'editorial' ? 'bg-stone-200' : 'bg-slate-900'}`}></div>
+                  <span className={`text-[9px] uppercase tracking-widest font-semibold ${themeColor === 'editorial' ? 'text-stone-400' : 'text-slate-600'}`}>
+                    Featured Stack
+                  </span>
+                  <div className={`flex-grow h-px ${themeColor === 'editorial' ? 'bg-stone-200' : 'bg-slate-900'}`}></div>
+                </div>
+
+                {/* 3. THREE LOWER VERTICAL STACKED FRAMES */}
+                <section className="w-full flex flex-col gap-8">
+                  
+                  {/* LOWER FRAME 1 */}
+                  <div className={`rounded-2xl p-6 border border-solid transition-all ${
+                    themeColor === 'editorial' ? 'bg-stone-50 border-stone-200 shadow-sm' :
+                    themeColor === 'emerald' ? 'bg-zinc-900 border-zinc-850' :
+                    themeColor === 'sunset' ? 'bg-neutral-900 border-neutral-850' :
+                    'bg-slate-900/60 border-slate-850 backdrop-blur shadow-2xl'
+                  }`}>
+                    {lowerFrame1.type === 'content' && (
+                      <div>
+                        {lowerFrame1.contentBody && (lowerFrame1.contentBody.includes('letterboxd.com/') || lowerFrame1.contentBody.includes('/film/')) ? (
+                          <LetterboxdReviewLiveCard url={lowerFrame1.contentBody} fallbackTitle={lowerFrame1.title} />
+                        ) : (
+                          <>
+                            <h4 className={`text-sm font-bold mb-2 ${themeColor === 'editorial' ? 'text-stone-900 font-serif' : 'text-white'}`}>{lowerFrame1.title}</h4>
+                            <p className={`text-xs whitespace-pre-line leading-relaxed ${themeColor === 'editorial' ? 'text-stone-700' : 'text-slate-300'}`}>{lowerFrame1.contentBody}</p>
+                          </>
+                        )}
+                      </div>
+                    )}
+                    {lowerFrame1.type === 'image' && (
+                      <div className="space-y-2">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame1.title}</h4>
+                        <img src={lowerFrame1.imageUrl} alt="Lower Visual 1" className="w-full h-44 object-cover rounded-xl shadow-md border border-slate-800/10" />
+                        <p className={`text-xs ${themeColor === 'editorial' ? 'text-stone-600' : 'text-slate-400'}`}>{lowerFrame1.contentBody}</p>
+                      </div>
+                    )}
+                    {lowerFrame1.type === 'embed_tally' && (
+                      <div className="space-y-2">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame1.title}</h4>
+                        <div className="w-full aspect-[16/9] rounded-xl overflow-hidden border border-slate-800 bg-slate-950">
+                          <iframe src={lowerFrame1.iframeUrl} width="100%" height="100%" frameBorder="0" title={lowerFrame1.title}>Loading...</iframe>
+                        </div>
+                      </div>
+                    )}
+                    {lowerFrame1.type === 'form' && (
+                      <div className="space-y-3">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame1.title}</h4>
+                        <p className={`text-xs ${themeColor === 'editorial' ? 'text-stone-600' : 'text-slate-400'}`}>{lowerFrame1.contentBody}</p>
+                        <form onSubmit={handleMockSubmit} className="space-y-2">
+                          <input 
+                            type="email" 
+                            placeholder="Your email address..." 
+                            required
+                            className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none ${
+                              themeColor === 'editorial' 
+                                ? 'bg-white border-stone-300 text-stone-900 focus:border-stone-500' 
+                                : 'bg-slate-950 border-slate-800 text-white focus:border-indigo-500'
+                            }`} 
+                          />
+                          <button type="submit" className={`w-full text-[10px] font-bold py-2 rounded-lg uppercase tracking-wider transition-all ${
+                            themeColor === 'editorial' ? 'bg-[#4a3f35] text-amber-50 hover:bg-[#5c4f42]' : 'bg-indigo-600 text-white hover:bg-indigo-500'
+                          }`}>
+                            Send Info
+                          </button>
+                        </form>
+                      </div>
+                    )}
+                    {lowerFrame1.type === 'custom_html' && (
+                      <div className="space-y-2">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame1.title}</h4>
+                        <div dangerouslySetInnerHTML={{ __html: lowerFrame1.contentBody }} />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* LOWER FRAME 2 */}
+                  <div className={`rounded-2xl p-6 border border-solid transition-all ${
+                    themeColor === 'editorial' ? 'bg-stone-50 border-stone-200 shadow-sm' :
+                    themeColor === 'emerald' ? 'bg-zinc-900 border-zinc-850' :
+                    themeColor === 'sunset' ? 'bg-neutral-900 border-neutral-850' :
+                    'bg-slate-900/60 border-slate-850 backdrop-blur shadow-2xl'
+                  }`}>
+                    {lowerFrame2.type === 'content' && (
+                      <div>
+                        {lowerFrame2.contentBody && lowerFrame2.contentBody.includes('ranking-of-film-releases-in-spain-in-2025') ? (
+                          <div className="space-y-2">
+                            <h4 className={`text-sm font-bold mb-2 ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame2.title}</h4>
+                            <LetterboxdSpainListLiveCard 
+                              sharedXml={sharedXml}
+                              sharedLoading={sharedLoading}
+                            />
+                          </div>
+                        ) : lowerFrame2.contentBody && (lowerFrame2.contentBody.includes('letterboxd.com/') || lowerFrame2.contentBody.includes('/film/')) ? (
+                          <LetterboxdReviewLiveCard url={lowerFrame2.contentBody} fallbackTitle={lowerFrame2.title} />
+                        ) : (
+                          <>
+                            <h4 className={`text-sm font-bold mb-2 ${themeColor === 'editorial' ? 'text-stone-900 font-serif' : 'text-white'}`}>{lowerFrame2.title}</h4>
+                            <p className={`text-xs whitespace-pre-line leading-relaxed ${themeColor === 'editorial' ? 'text-stone-700' : 'text-slate-300'}`}>{lowerFrame2.contentBody}</p>
+                          </>
+                        )}
+                      </div>
+                    )}
+                    {lowerFrame2.type === 'image' && (
+                      <div className="space-y-2">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame2.title}</h4>
+                        <img src={lowerFrame2.imageUrl} alt="Lower Visual 2" className="w-full h-44 object-cover rounded-xl shadow-md border border-slate-800/10" />
+                        <p className={`text-xs ${themeColor === 'editorial' ? 'text-stone-600' : 'text-slate-400'}`}>{lowerFrame2.contentBody}</p>
+                      </div>
+                    )}
+                    {lowerFrame2.type === 'embed_tally' && (
+                      <div className="space-y-2">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame2.title}</h4>
+                        <div className="w-full aspect-[16/9] rounded-xl overflow-hidden border border-slate-800 bg-slate-950">
+                          <iframe src={lowerFrame2.iframeUrl} width="100%" height="100%" frameBorder="0" title={lowerFrame2.title}>Loading...</iframe>
+                        </div>
+                      </div>
+                    )}
+                    {lowerFrame2.type === 'form' && (
+                      <div className="space-y-3">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame2.title}</h4>
+                        <p className={`text-xs ${themeColor === 'editorial' ? 'text-stone-600' : 'text-slate-400'}`}>{lowerFrame2.contentBody}</p>
+                        <form onSubmit={handleMockSubmit} className="space-y-2">
+                          <input 
+                            type="email" 
+                            placeholder="Your email address..." 
+                            required
+                            className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none ${
+                              themeColor === 'editorial' 
+                                ? 'bg-white border-stone-300 text-stone-900 focus:border-stone-500' 
+                                : 'bg-slate-950 border-slate-800 text-white focus:border-indigo-500'
+                            }`} 
+                          />
+                          <button type="submit" className={`w-full text-[10px] font-bold py-2 rounded-lg uppercase tracking-wider transition-all ${
+                            themeColor === 'editorial' ? 'bg-[#4a3f35] text-amber-50 hover:bg-[#5c4f42]' : 'bg-indigo-600 text-white hover:bg-indigo-500'
+                          }`}>
+                            Send Info
+                          </button>
+                        </form>
+                      </div>
+                    )}
+                    {lowerFrame2.type === 'custom_html' && (
+                      <div className="space-y-2">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame2.title}</h4>
+                        <div dangerouslySetInnerHTML={{ __html: lowerFrame2.contentBody }} />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* LOWER FRAME 3 */}
+                  <div className={`rounded-2xl p-6 border border-solid transition-all ${
+                    themeColor === 'editorial' ? 'bg-stone-50 border-stone-200 shadow-sm' :
+                    themeColor === 'emerald' ? 'bg-zinc-900 border-zinc-850' :
+                    themeColor === 'sunset' ? 'bg-neutral-900 border-neutral-850' :
+                    'bg-slate-900/60 border-slate-850 backdrop-blur shadow-2xl'
+                  }`}>
+                    {lowerFrame3.type === 'content' && (
+                      <div>
+                        {lowerFrame3.contentBody && lowerFrame3.contentBody.includes('if-i-can-ill-go-and-see-them-at-the-cinema') ? (
+                          <div className="space-y-2">
+                            <h4 className={`text-sm font-bold mb-2 ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame3.title}</h4>
+                            <LetterboxdFilmReels 
+                              sharedXml={sharedXml}
+                              sharedLoading={sharedLoading}
+                              sharedError={sharedError}
+                              sharedIsReal={sharedIsReal}
+                            />
+                          </div>
+                        ) : lowerFrame3.contentBody && (lowerFrame3.contentBody.includes('letterboxd.com/') || lowerFrame3.contentBody.includes('/film/')) ? (
+                          <LetterboxdReviewLiveCard url={lowerFrame3.contentBody} fallbackTitle={lowerFrame3.title} />
+                        ) : (
+                          <>
+                            <h4 className={`text-sm font-bold mb-2 ${themeColor === 'editorial' ? 'text-stone-900 font-serif' : 'text-white'}`}>{lowerFrame3.title}</h4>
+                            <p className={`text-xs whitespace-pre-line leading-relaxed ${themeColor === 'editorial' ? 'text-stone-700' : 'text-slate-300'}`}>{lowerFrame3.contentBody}</p>
+                          </>
+                        )}
+                      </div>
+                    )}
+                    {lowerFrame3.type === 'image' && (
+                      <div className="space-y-2">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame3.title}</h4>
+                        <img src={lowerFrame3.imageUrl} alt="Lower Visual 3" className="w-full h-44 object-cover rounded-xl shadow-md border border-slate-800/10" />
+                        <p className={`text-xs ${themeColor === 'editorial' ? 'text-stone-600' : 'text-slate-400'}`}>{lowerFrame3.contentBody}</p>
+                      </div>
+                    )}
+                    {lowerFrame3.type === 'embed_tally' && (
+                      <div className="space-y-2">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame3.title}</h4>
+                        <div className="w-full aspect-[16/9] rounded-xl overflow-hidden border border-slate-800 bg-slate-950">
+                          <iframe src={lowerFrame3.iframeUrl} width="100%" height="100%" frameBorder="0" title={lowerFrame3.title}>Loading...</iframe>
+                        </div>
+                      </div>
+                    )}
+                    {lowerFrame3.type === 'form' && (
+                      <div className="space-y-3">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame3.title}</h4>
+                        <p className={`text-xs ${themeColor === 'editorial' ? 'text-stone-600' : 'text-slate-400'}`}>{lowerFrame3.contentBody}</p>
+                        <form onSubmit={handleMockSubmit} className="space-y-2">
+                          <input 
+                            type="email" 
+                            placeholder="Your email address..." 
+                            required
+                            className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none ${
+                              themeColor === 'editorial' 
+                                ? 'bg-white border-stone-300 text-stone-900 focus:border-stone-500' 
+                                : 'bg-slate-950 border-slate-800 text-white focus:border-indigo-500'
+                            }`} 
+                          />
+                          <button type="submit" className={`w-full text-[10px] font-bold py-2 rounded-lg uppercase tracking-wider transition-all ${
+                            themeColor === 'editorial' ? 'bg-[#4a3f35] text-amber-50 hover:bg-[#5c4f42]' : 'bg-indigo-600 text-white hover:bg-indigo-500'
+                          }`}>
+                            Send Info
+                          </button>
+                        </form>
+                      </div>
+                    )}
+                    {lowerFrame3.type === 'custom_html' && (
+                      <div className="space-y-2">
+                        <h4 className={`text-sm font-bold ${themeColor === 'editorial' ? 'text-stone-900' : 'text-white'}`}>{lowerFrame3.title}</h4>
+                        <div dangerouslySetInnerHTML={{ __html: lowerFrame3.contentBody }} />
+                      </div>
+                    )}
+                  </div>
+
+                </section>
+
+              </div>
+
+              {/* Pure Webpage Footer */}
+              <footer className={`text-center text-[10px] border-t pt-8 mt-16 space-y-1 ${
+                themeColor === 'editorial' ? 'text-stone-500 border-stone-200' : 'text-slate-500 border-slate-900'
+              }`}>
+                <p>© {new Date().getFullYear()} Centered 4-Frame Site. Constructed entirely free.</p>
+                <p className="font-mono text-[9px]">Hosted securely with 100% zero hosting costs via free platforms.</p>
+              </footer>
+
+            </div>
+
+            {/* Float Back to Editor Action Pin */}
+            <div className="fixed bottom-6 right-6 z-50">
+              <button
+                onClick={() => setActiveTab('sandbox')}
+                className="flex items-center gap-2 px-4.5 py-3 rounded-full bg-slate-950 hover:bg-slate-900 text-slate-200 font-extrabold text-xs shadow-2xl shadow-indigo-950/50 hover:scale-105 transition-all border border-slate-800"
+              >
+                <span>✏️ Open Editor</span>
+              </button>
+            </div>
+          </div>
+        )}
+
       </main>
 
-      {/* FOOTER */}
-      <footer className="bg-slate-950 border-t border-slate-900 py-6 text-center text-slate-500 text-xs mt-12 space-y-2">
-        <div className="flex justify-center items-center gap-2 text-[10px] text-slate-400 font-mono">
-          <Shield className="w-3.5 h-3.5 text-indigo-400" />
-          <span>SSL Secured Static Sandbox</span>
-          <span className="text-slate-700">•</span>
-          <AlignJustify className="w-3.5 h-3.5 text-indigo-400" />
-          <span>Perfect 4-Frame Viewport Aligned</span>
-        </div>
-        <p className="text-slate-600 text-[11px]">Designed recursively to support modern zero-cost developer practice.</p>
-      </footer>
+      {/* FOOTER (Hidden in Pure Webpage Preview for a pristine display) */}
+      {activeTab !== 'live-view' && (
+        <footer className="bg-slate-950 border-t border-slate-900 py-6 text-center text-slate-500 text-xs mt-12 space-y-2">
+          <div className="flex justify-center items-center gap-2 text-[10px] text-slate-400 font-mono">
+            <Shield className="w-3.5 h-3.5 text-indigo-400" />
+            <span>SSL Secured Static Sandbox</span>
+            <span className="text-slate-700">•</span>
+            <AlignJustify className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Perfect 4-Frame Viewport Aligned</span>
+          </div>
+          <p className="text-slate-600 text-[11px]">Designed recursively to support modern zero-cost developer practice.</p>
+        </footer>
+      )}
 
     </div>
   );
