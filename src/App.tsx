@@ -748,7 +748,7 @@ export default function App() {
     </div>
 
     <!-- LOWER THREE FRAMES (Horizontally aligned side-by-side) -->
-    <section class="max-w-4xl w-full mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
+    <section class="max-w-4xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
       ${generateFrameHTML(lowerFrame1, false)}
       ${generateFrameHTML(lowerFrame2, false)}
       ${generateFrameHTML(lowerFrame3, false)}
@@ -1802,7 +1802,7 @@ export default function App() {
                         </div>
 
                         {/* THREE LOWER GRID FRAMES */}
-                        <div className="max-w-2xl mx-auto w-full grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="max-w-2xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-4">
                           
                           {/* FRAME 1 */}
                           <div className="w-full bg-slate-900/60 p-4 rounded-xl border border-slate-800 hover:border-indigo-500/40 transition-all">
@@ -2412,7 +2412,7 @@ export default function App() {
                 </div>
 
                 {/* 3. THREE LOWER FRAMES (Side-by-side grid) */}
-                <section className="w-full grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-6">
                   
                   {/* LOWER FRAME 1 */}
                   <div className={`rounded-2xl p-6 border border-solid transition-all ${
