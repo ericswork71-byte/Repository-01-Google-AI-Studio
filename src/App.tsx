@@ -48,6 +48,24 @@ interface FrameConfig {
 }
 
 export default function App() {
+  // Check if we are running in the deployed production mode (e.g., GitHub Pages or a custom domain outside AI Studio)
+  const isPureProductionView = (() => {
+    if (typeof window === 'undefined') return false;
+    const hostname = window.location.hostname;
+    const searchParams = new URLSearchParams(window.location.search);
+    
+    // Explicit bypass to let the user open the sandbox even on their deployed site if needed
+    if (searchParams.has('edit') || searchParams.has('sandbox')) {
+      return false;
+    }
+    
+    // Deployed to GitHub Pages or running on a custom domain outside of AI Studio containers
+    const isGithub = hostname.includes('github.io');
+    const isAiStudio = hostname.includes('.run.app') || hostname === 'localhost' || hostname === '127.0.0.1';
+    
+    return isGithub || !isAiStudio;
+  })();
+
   const [activeTab, setActiveTab] = useState<'sandbox' | 'hosting-guide' | 'layout-theory' | 'live-view'>('live-view');
 
   // Centered Shared RSS Feed States to prevent duplicate network request overhead across components
@@ -2253,40 +2271,42 @@ export default function App() {
             'bg-slate-950 text-slate-100 font-sans'
           }`}>
             {/* Elegant Sticky Preview Action Bar */}
-            <div className="bg-slate-950 border-b border-slate-900 px-4 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-xl backdrop-blur-md bg-opacity-95">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping inline-block"></span>
-                <span className="text-xs font-mono font-bold text-slate-300">LIVE WEBSITE DEMO</span>
-                <span className="text-[10px] text-slate-500 hidden sm:inline">
-                  | Experiencing your custom 4-frame design exactly as a visitor sees it
-                </span>
+            {!isPureProductionView && (
+              <div className="bg-slate-950 border-b border-slate-900 px-4 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-xl backdrop-blur-md bg-opacity-95">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping inline-block"></span>
+                  <span className="text-xs font-mono font-bold text-slate-300">LIVE WEBSITE DEMO</span>
+                  <span className="text-[10px] text-slate-500 hidden sm:inline">
+                    | Experiencing your custom 4-frame design exactly as a visitor sees it
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleCopyCode}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-all font-semibold"
+                    title="Copy full single-file index.html code"
+                  >
+                    {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-indigo-400" />}
+                    <span>{copiedCode ? 'Copied HTML!' : 'Copy Page Code'}</span>
+                  </button>
+                  <button
+                    onClick={handleExportZipFile}
+                    disabled={zipLoading}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs bg-indigo-600 hover:bg-indigo-500 text-white transition-all font-bold disabled:opacity-60"
+                    title="Export complete web server packages & source files in ZIP"
+                  >
+                    {zipLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <FolderArchive className="w-3.5 h-3.5 text-indigo-200" />}
+                    <span>{zipLoading ? 'Bundling...' : 'Download ZIP Package'}</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('sandbox')}
+                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold transition-all shadow-lg shadow-emerald-950/20"
+                  >
+                    <span>✏️ Open Sandbox Editor</span>
+                  </button>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleCopyCode}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-all font-semibold"
-                  title="Copy full single-file index.html code"
-                >
-                  {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-indigo-400" />}
-                  <span>{copiedCode ? 'Copied HTML!' : 'Copy Page Code'}</span>
-                </button>
-                <button
-                  onClick={handleExportZipFile}
-                  disabled={zipLoading}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs bg-indigo-600 hover:bg-indigo-500 text-white transition-all font-bold disabled:opacity-60"
-                  title="Export complete web server packages & source files in ZIP"
-                >
-                  {zipLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <FolderArchive className="w-3.5 h-3.5 text-indigo-200" />}
-                  <span>{zipLoading ? 'Bundling...' : 'Download ZIP Package'}</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('sandbox')}
-                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold transition-all shadow-lg shadow-emerald-950/20"
-                >
-                  <span>✏️ Open Sandbox Editor</span>
-                </button>
-              </div>
-            </div>
+            )}
 
             {/* Pristine 4-Frame Webpage Stage */}
             <div className="flex-grow py-12 px-4 md:px-8 max-w-5xl mx-auto w-full relative">
@@ -2642,14 +2662,16 @@ export default function App() {
             </div>
 
             {/* Float Back to Editor Action Pin */}
-            <div className="fixed bottom-6 right-6 z-50">
-              <button
-                onClick={() => setActiveTab('sandbox')}
-                className="flex items-center gap-2 px-4.5 py-3 rounded-full bg-slate-950 hover:bg-slate-900 text-slate-200 font-extrabold text-xs shadow-2xl shadow-indigo-950/50 hover:scale-105 transition-all border border-slate-800"
-              >
-                <span>✏️ Open Editor</span>
-              </button>
-            </div>
+            {!isPureProductionView && (
+              <div className="fixed bottom-6 right-6 z-50">
+                <button
+                  onClick={() => setActiveTab('sandbox')}
+                  className="flex items-center gap-2 px-4.5 py-3 rounded-full bg-slate-950 hover:bg-slate-900 text-slate-200 font-extrabold text-xs shadow-2xl shadow-indigo-950/50 hover:scale-105 transition-all border border-slate-800"
+                >
+                  <span>✏️ Open Editor</span>
+                </button>
+              </div>
+            )}
           </div>
         )}
 
