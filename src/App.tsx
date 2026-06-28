@@ -542,6 +542,10 @@ export default function App() {
                     if (parts.length > 3) opinionAuthor = parts[3];
                   } catch(err) {}
 
+                  if (!filmTitle || filmTitle.length < 2 || filmTitle.toLowerCase().includes("error") || filmTitle.toLowerCase().includes("just a moment") || filmTitle.toLowerCase().includes("cloudflare") || !reviewExcerpt || reviewExcerpt.length < 10) {
+                    return null;
+                  }
+
                   return {
                     title: filmTitle,
                     year: year,
@@ -583,8 +587,11 @@ export default function App() {
                       const proxyRes = await fetch(corsUrl);
                       if (proxyRes.ok) {
                         const html = await proxyRes.text();
-                        data = parseReviewHtml(html, u);
-                        hasLive = true;
+                        const parsed = parseReviewHtml(html, u);
+                        if (parsed) {
+                          data = parsed;
+                          hasLive = true;
+                        }
                       }
                     } catch(e) {}
                   }
