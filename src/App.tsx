@@ -757,32 +757,96 @@ export default function App() {
         inner = `
           <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-2">
             <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
-              <span class="text-[10px] font-mono font-bold text-indigo-400 tracking-wider uppercase">${frame.title}</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+              <span class="text-[10px] font-mono font-bold text-red-400 tracking-wider uppercase">${frame.title}</span>
             </div>
             <span class="text-[10px] text-slate-500 font-mono">Live feed</span>
           </div>
           
           <!-- Live Loading Status -->
           <div id="carousel-loading" class="flex flex-col items-center justify-center py-12 text-slate-400 space-y-3">
-            <div class="animate-spin h-6 w-6 border-2 border-indigo-500 border-t-transparent rounded-full mb-1"></div>
-            <span class="text-xs font-mono text-indigo-300 animate-pulse">Syncing Letterboxd 5-Column Grid...</span>
+            <div class="animate-spin h-6 w-6 border-2 border-red-500 border-t-transparent rounded-full mb-1"></div>
+            <span class="text-xs font-mono text-red-300 animate-pulse">Syncing Letterboxd 5-Column Filmstrip...</span>
           </div>
 
           <!-- Loaded Grid/Carousel Item viewport -->
           <div id="carousel-container" class="hidden space-y-4">
-            <!-- 5 columns grid -->
-            <div id="carousel-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-              <!-- Programmatically populated movie cards -->
+            <!-- Continuous Film Reel / Strip Outer Frame -->
+            <div class="w-full bg-[#07070a] border-[3px] border-[#1c1c22] rounded-xl p-3 md:p-4 relative shadow-[0_15px_35px_rgba(0,0,0,0.85)] z-10 my-4 overflow-hidden">
+              <!-- Sprocket holes top -->
+              <div class="flex justify-between px-1.5 mb-3 opacity-65">
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+              </div>
+
+              <!-- Film cells stage -->
+              <div class="bg-stone-950 p-2 rounded-lg border border-white/5">
+                <!-- 5 columns grid -->
+                <div id="carousel-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                  <!-- Programmatically populated movie cards -->
+                </div>
+              </div>
+
+              <!-- Sprocket holes bottom -->
+              <div class="flex justify-between px-1.5 mt-3 opacity-65">
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+                <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+              </div>
             </div>
 
             <!-- Controls row below -->
             <div class="flex items-center justify-between border-t border-slate-850 pt-3 text-[10px] mt-1">
               <div class="text-slate-500 font-mono" id="carousel-counter"></div>
               <div class="flex items-center gap-2">
-                <button id="btn-prev" class="px-2 py-1 rounded bg-slate-950 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white transition cursor-pointer select-none font-bold">&larr;</button>
-                <button id="btn-play" class="px-3 py-1.5 rounded bg-slate-950 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white transition text-[9px] font-bold font-mono cursor-pointer select-none">Pause</button>
-                <button id="btn-next" class="px-2 py-1 rounded bg-slate-950 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white transition cursor-pointer select-none font-bold">&rarr;</button>
+                <button id="btn-prev" class="px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white hover:bg-slate-900 transition cursor-pointer select-none font-bold">&larr;</button>
+                <button id="btn-play" class="px-4 py-2 rounded bg-slate-950 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white hover:bg-slate-900 transition text-[9px] font-bold font-mono cursor-pointer select-none">Pause</button>
+                <button id="btn-next" class="px-2.5 py-1.5 rounded bg-slate-950 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white hover:bg-slate-900 transition cursor-pointer select-none font-bold">&rarr;</button>
               </div>
             </div>
           </div>
@@ -831,8 +895,13 @@ export default function App() {
 <body class="bg-[#050508] text-slate-200 min-h-screen flex flex-col justify-between selection:bg-red-600 selection:text-white relative overflow-x-hidden">
 
   <!-- Projector Spotlight Beam -->
-  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[130vh] pointer-events-none -z-10 overflow-hidden">
-    <div class="w-full h-full opacity-40 mix-blend-screen" style="background: linear-gradient(to bottom, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.04) 50%, rgba(255, 255, 255, 0) 100%); clip-path: polygon(48% 0%, 52% 0%, 100% 100%, 0% 100%);"></div>
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[130vh] pointer-events-none -z-10 overflow-hidden select-none">
+    <!-- Bright Spotlight Source -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-2 bg-white/95 rounded-b-full filter blur-[1px] opacity-90 shadow-[0_0_50px_rgba(255,255,255,1)] z-0"></div>
+    <!-- Volumetric light cone -->
+    <div class="w-full h-full opacity-60 mix-blend-screen" style="background: linear-gradient(to bottom, rgba(255, 255, 255, 0.25) 0%, rgba(239, 68, 68, 0.06) 40%, rgba(239, 68, 68, 0.01) 80%, transparent 100%); clip-path: polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%); filter: blur(6px);"></div>
+    <!-- Inner sharper beam of light -->
+    <div class="absolute inset-0 w-full h-full opacity-35 mix-blend-screen" style="background: linear-gradient(to bottom, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.04) 50%, transparent 100%); clip-path: polygon(48% 0%, 52% 0%, 85% 100%, 15% 100%); filter: blur(2px);"></div>
   </div>
 
   <!-- Main Grid Page Layout -->
@@ -850,63 +919,7 @@ export default function App() {
         A hand-crafted projection of cinematic logs, live diaries, and review cards.
       </p>
 
-      <!-- Beautiful Film Strip -->
-      <div class="w-full max-w-[440px] mx-auto bg-[#07070a] border-[3px] border-[#1c1c22] rounded-lg p-2.5 relative shadow-[0_12px_30px_rgba(0,0,0,0.9)] z-10 my-4">
-        <!-- Sprocket holes top -->
-        <div class="flex justify-between px-0.5 mb-1.5 opacity-55">
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-        </div>
-        <!-- Film cells -->
-        <div class="grid grid-cols-5 gap-2 h-14 bg-stone-950 p-1 rounded">
-          <div class="bg-gradient-to-b from-white/12 to-white/0 border border-white/5 rounded flex items-center justify-center">
-            <div class="w-1.5 h-1.5 rounded-full bg-white/5"></div>
-          </div>
-          <div class="bg-gradient-to-b from-white/12 to-white/0 border border-white/5 rounded flex items-center justify-center">
-            <div class="w-1.5 h-1.5 rounded-full bg-white/5"></div>
-          </div>
-          <div class="bg-gradient-to-b from-white/12 to-white/0 border border-white/5 rounded flex items-center justify-center">
-            <div class="w-1.5 h-1.5 rounded-full bg-white/5"></div>
-          </div>
-          <div class="bg-gradient-to-b from-white/12 to-white/0 border border-white/5 rounded flex items-center justify-center">
-            <div class="w-1.5 h-1.5 rounded-full bg-white/5"></div>
-          </div>
-          <div class="bg-gradient-to-b from-white/12 to-white/0 border border-white/5 rounded flex items-center justify-center">
-            <div class="w-1.5 h-1.5 rounded-full bg-white/5"></div>
-          </div>
-        </div>
-        <!-- Sprocket holes bottom -->
-        <div class="flex justify-between px-0.5 mt-1.5 opacity-55">
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-        </div>
-      </div>
+
     </header>
 
     <!-- UPPER ROW (Occupies the Middle section horizontally) -->
@@ -1131,14 +1144,14 @@ export default function App() {
         }
 
         var cardHtml = 
-          '<div class="group relative flex flex-col bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-md hover:border-slate-700 transition-all duration-300">' +
+          '<div class="group relative flex flex-col bg-slate-900/90 border border-slate-800 rounded-lg overflow-hidden shadow-lg hover:border-indigo-500/50 hover:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all duration-300">' +
             '<div class="w-full aspect-[2/3] relative bg-slate-950 overflow-hidden">' +
               '<img src="' + movie.imageUrl + '" alt="' + movie.title + '" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" referrerpolicy="no-referrer" />' +
               ratingHtml +
               overlayHtml +
             '</div>' +
             
-            '<div class="p-2 flex-grow flex flex-col justify-between bg-slate-900/60 border-t border-slate-800/50 text-left">' +
+            '<div class="p-2.5 flex-grow flex flex-col justify-between bg-slate-900/60 border-t border-slate-800/50 text-left">' +
               '<div class="space-y-0.5">' +
                 '<h5 class="text-xs font-black text-slate-100 truncate tracking-tight hover:text-indigo-400 transition">' + movie.title + '</h5>' +
                 '<div class="flex items-center justify-between">' +
@@ -2536,12 +2549,25 @@ export default function App() {
           }`}>
             {/* Projector Spotlight Beam */}
             {themeColor !== 'editorial' && (
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[130vh] pointer-events-none -z-10 overflow-hidden">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[130vh] pointer-events-none -z-10 overflow-hidden select-none">
+                {/* Bright Spotlight Source */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-2 bg-white/95 rounded-b-full filter blur-[1px] opacity-90 shadow-[0_0_50px_rgba(255,255,255,1)] z-0" />
+                {/* Volumetric light cone */}
                 <div 
-                  className="w-full h-full opacity-40 mix-blend-screen" 
+                  className="w-full h-full opacity-60 mix-blend-screen" 
                   style={{
-                    background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.04) 50%, rgba(255, 255, 255, 0) 100%)',
-                    clipPath: 'polygon(48% 0%, 52% 0%, 100% 100%, 0% 100%)'
+                    background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.25) 0%, rgba(239, 68, 68, 0.06) 40%, rgba(239, 68, 68, 0.01) 80%, transparent 100%)',
+                    clipPath: 'polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%)',
+                    filter: 'blur(6px)'
+                  }}
+                />
+                {/* Inner sharper beam of light */}
+                <div 
+                  className="absolute inset-0 w-full h-full opacity-35 mix-blend-screen" 
+                  style={{
+                    background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.04) 50%, transparent 100%)',
+                    clipPath: 'polygon(48% 0%, 52% 0%, 85% 100%, 15% 100%)',
+                    filter: 'blur(2px)'
                   }}
                 />
               </div>
@@ -2616,26 +2642,7 @@ export default function App() {
                         A hand-crafted projection of cinematic logs, live diaries, and review cards.
                       </p>
 
-                      {/* Beautiful Film Strip Graphic */}
-                      <div className="w-full max-w-[440px] mx-auto bg-[#07070a] border-[3px] border-[#1c1c22] rounded-lg p-2.5 relative shadow-[0_12px_30px_rgba(0,0,0,0.9)] z-10 my-4">
-                        <div className="flex justify-between px-0.5 mb-1.5 opacity-55">
-                          {Array.from({ length: 15 }).map((_, i) => (
-                            <div key={i} className="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-                          ))}
-                        </div>
-                        <div className="grid grid-cols-5 gap-2 h-14 bg-stone-950 p-1 rounded">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <div key={i} className="bg-gradient-to-b from-white/12 to-white/0 border border-white/5 rounded flex items-center justify-center">
-                              <div className="w-1.5 h-1.5 rounded-full bg-white/5"></div>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="flex justify-between px-0.5 mt-1.5 opacity-55">
-                          {Array.from({ length: 15 }).map((_, i) => (
-                            <div key={i} className="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
-                          ))}
-                        </div>
-                      </div>
+
                     </>
                   )}
                 </header>

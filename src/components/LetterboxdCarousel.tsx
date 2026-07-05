@@ -384,70 +384,89 @@ export default function LetterboxdCarousel({
         </div>
       )}
 
-      {/* 5 columns Grid layout container with responsive slide behavior */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-        {visibleMovies.map((movie, index) => (
-          <div 
-            key={`${movie.title}-${index}`}
-            className="group relative flex flex-col bg-slate-900/90 border border-slate-800 rounded-xl overflow-hidden shadow-lg hover:border-slate-700 transition-all duration-300"
-          >
-            {/* Visual Film Poster & Star rating overlay */}
-            <div className="w-full aspect-[2/3] relative bg-slate-950 overflow-hidden">
-              <img 
-                src={movie.imageUrl} 
-                alt={movie.title}
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              
-              {/* Rating Star Badge */}
-              {movie.rating && movie.rating !== "No rating" && (
-                <div className="absolute top-1.5 left-1.5 bg-slate-950/90 text-amber-400 text-[10px] font-bold px-1.5 py-0.5 rounded border border-slate-800/80 font-mono shadow">
-                  {movie.rating}
-                </div>
-              )}
+      {/* Continuous Film Reel / Strip Outer Frame */}
+      <div className="w-full bg-[#07070a] border-[3px] border-[#1c1c22] rounded-xl p-3 md:p-4 relative shadow-[0_15px_35px_rgba(0,0,0,0.85)] z-10 my-4 overflow-hidden">
+        {/* Sprocket holes top */}
+        <div className="flex justify-between px-1.5 mb-3 opacity-65">
+          {Array.from({ length: 25 }).map((_, i) => (
+            <div key={i} className="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+          ))}
+        </div>
 
-              {/* Hover overlay exhibiting review excerpt */}
-              {movie.reviewExcerpt && (
-                <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-3 flex flex-col justify-between text-left">
-                  <div className="space-y-1.5 overflow-hidden">
-                    <span className="text-[8px] tracking-wider uppercase font-mono font-bold text-slate-400 block border-b border-slate-800 pb-1">
-                      Review Excerpt
-                    </span>
-                    <p className="text-[10px] text-slate-200 line-clamp-6 leading-relaxed italic">
-                      "{movie.reviewExcerpt}"
-                    </p>
-                  </div>
-                  <div className="border-t border-slate-900 pt-1.5 text-[8px] font-mono text-slate-400 flex items-center gap-1">
-                    <Calendar className="w-2.5 h-2.5" />
-                    <span>Logged {movie.watchedDate || "recently"}</span>
-                  </div>
-                </div>
-              )}
-            </div>
+        {/* Film cells stage */}
+        <div className="bg-stone-950 p-2 rounded-lg border border-white/5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            {visibleMovies.map((movie, index) => (
+              <div 
+                key={`${movie.title}-${index}`}
+                className="group relative flex flex-col bg-slate-900/90 border border-slate-800 rounded-lg overflow-hidden shadow-lg hover:border-indigo-500/50 hover:shadow-[0_0_15px_rgba(99,102,241,0.15)] transition-all duration-300"
+              >
+                {/* Visual Film Poster & Star rating overlay */}
+                <div className="w-full aspect-[2/3] relative bg-slate-950 overflow-hidden">
+                  <img 
+                    src={movie.imageUrl} 
+                    alt={movie.title}
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  
+                  {/* Rating Star Badge */}
+                  {movie.rating && movie.rating !== "No rating" && (
+                    <div className="absolute top-1.5 left-1.5 bg-slate-950/90 text-amber-400 text-[10px] font-bold px-1.5 py-0.5 rounded border border-slate-800/80 font-mono shadow">
+                      {movie.rating}
+                    </div>
+                  )}
 
-            {/* Film bottom metadata panel */}
-            <div className="p-2.5 flex-grow flex flex-col justify-between bg-slate-900/60 border-t border-slate-800/50">
-              <div className="space-y-0.5">
-                <h5 className="text-xs font-black text-slate-100 truncate tracking-tight group-hover:text-indigo-400 transition">
-                  {movie.title}
-                </h5>
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-slate-500 font-mono">({movie.year || "N/A"})</span>
-                  <a 
-                    href={movie.link} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="text-slate-500 hover:text-white transition"
-                    title="View review entry on Letterboxd"
-                  >
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
+                  {/* Hover overlay exhibiting review excerpt */}
+                  {movie.reviewExcerpt && (
+                    <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-3 flex flex-col justify-between text-left">
+                      <div className="space-y-1.5 overflow-hidden">
+                        <span className="text-[8px] tracking-wider uppercase font-mono font-bold text-slate-400 block border-b border-slate-800 pb-1">
+                          Review Excerpt
+                        </span>
+                        <p className="text-[10px] text-slate-200 line-clamp-6 leading-relaxed italic">
+                          "{movie.reviewExcerpt}"
+                        </p>
+                      </div>
+                      <div className="border-t border-slate-900 pt-1.5 text-[8px] font-mono text-slate-400 flex items-center gap-1">
+                        <Calendar className="w-2.5 h-2.5" />
+                        <span>Logged {movie.watchedDate || "recently"}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Film bottom metadata panel */}
+                <div className="p-2.5 flex-grow flex flex-col justify-between bg-slate-900/60 border-t border-slate-800/50">
+                  <div className="space-y-0.5">
+                    <h5 className="text-xs font-black text-slate-100 truncate tracking-tight group-hover:text-indigo-400 transition">
+                      {movie.title}
+                    </h5>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-slate-500 font-mono">({movie.year || "N/A"})</span>
+                      <a 
+                        href={movie.link} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-slate-500 hover:text-white transition"
+                        title="View review entry on Letterboxd"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* Sprocket holes bottom */}
+        <div className="flex justify-between px-1.5 mt-3 opacity-65">
+          {Array.from({ length: 25 }).map((_, i) => (
+            <div key={i} className="w-2.5 h-1.5 bg-stone-500/70 rounded-sm shrink-0"></div>
+          ))}
+        </div>
       </div>
 
       {/* Control bar */}
