@@ -4,6 +4,7 @@ import { ExternalLink } from 'lucide-react';
 interface LetterboxdReviewLiveCardProps {
   url: string;
   fallbackTitle?: string;
+  themeColor?: string;
 }
 
 interface ReviewData {
@@ -251,9 +252,11 @@ function parseReviewHtml(html: string, urlToFetch: string): ReviewData {
   };
 }
 
-export default function LetterboxdReviewLiveCard({ url, fallbackTitle }: LetterboxdReviewLiveCardProps) {
+export default function LetterboxdReviewLiveCard({ url, fallbackTitle, themeColor }: LetterboxdReviewLiveCardProps) {
   const [reviews, setReviews] = useState<ReviewData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  
+  const isRedTheme = !themeColor || themeColor === 'slate';
 
   useEffect(() => {
     let active = true;
@@ -432,12 +435,12 @@ export default function LetterboxdReviewLiveCard({ url, fallbackTitle }: Letterb
   return (
     <div className="space-y-4">
       {fallbackTitle && (
-        <div className="flex items-center justify-between pb-2 border-b border-slate-900/60">
+        <div className={`flex items-center justify-between pb-2 border-b ${isRedTheme ? 'border-white/15' : 'border-slate-900/60'}`}>
           <div className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-md shadow-indigo-500/50"></span>
-            <span className="text-xs font-bold text-slate-100 tracking-tight uppercase font-mono">{fallbackTitle}</span>
+            <span className={`w-1.5 h-1.5 rounded-full ${isRedTheme ? 'bg-amber-300 shadow-amber-300/50' : 'bg-indigo-500 shadow-indigo-500/50'} shadow-md`}></span>
+            <span className={`text-xs font-bold tracking-tight uppercase font-mono ${isRedTheme ? 'text-white' : 'text-slate-100'}`}>{fallbackTitle}</span>
           </div>
-          <span className="text-[9px] font-mono text-slate-500">Live Letterboxd reviews</span>
+          <span className={`text-[9px] font-mono ${isRedTheme ? 'text-white/50' : 'text-slate-500'}`}>Live Letterboxd reviews</span>
         </div>
       )}
 
@@ -450,13 +453,20 @@ export default function LetterboxdReviewLiveCard({ url, fallbackTitle }: Letterb
           .trim();
 
         return (
-          <div key={index} className="bg-slate-950/40 p-4 rounded-xl border border-slate-800/80 hover:border-indigo-500/40 transition-all duration-300">
+          <div 
+            key={index} 
+            className={`p-4 rounded-xl border transition-all duration-300 ${
+              isRedTheme 
+                ? 'bg-black/20 border-white/5 hover:border-white/15 hover:bg-black/25 text-white' 
+                : 'bg-slate-950/40 border-slate-800/80 hover:border-indigo-500/40 text-slate-250'
+            }`}
+          >
             {/* Header: A review of author of the review */}
-            <div className="flex items-start justify-between mb-3 border-b border-slate-900/60 pb-2">
+            <div className={`flex items-start justify-between mb-3 border-b pb-2 ${isRedTheme ? 'border-white/10' : 'border-slate-900/60'}`}>
               <div className="flex flex-col gap-0.5 text-left">
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-amber-500 shadow shadow-amber-500/10"></span>
-                  <span className="text-[10px] font-mono font-bold text-amber-500 tracking-wider uppercase">
+                  <span className={`w-2 h-2 rounded-full ${isRedTheme ? 'bg-amber-300' : 'bg-amber-500'} shadow shadow-amber-500/10`}></span>
+                  <span className={`text-[10px] font-mono font-bold tracking-wider uppercase ${isRedTheme ? 'text-amber-300' : 'text-amber-500'}`}>
                     🎥 A review of {cleanTitle} by {username}
                   </span>
                 </div>
@@ -465,24 +475,43 @@ export default function LetterboxdReviewLiveCard({ url, fallbackTitle }: Letterb
                 href={data.link} 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="text-slate-500 hover:text-slate-350 font-mono text-[9px] flex items-center gap-1 transition"
+                className={`font-mono text-[9px] flex items-center gap-1 transition ${isRedTheme ? 'text-white/50 hover:text-white' : 'text-slate-500 hover:text-slate-350'}`}
               >
                 Open Letterboxd
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 items-start">
-              {/* Movie Poster */}
-              <div className="w-24 sm:w-28 flex-shrink-0 relative group">
-                <div className="w-full aspect-[2/3] bg-slate-900 rounded-lg overflow-hidden border border-slate-850 shadow-lg relative">
+            <div className="flex flex-col sm:flex-row gap-5 items-start">
+              {/* Postage Stamp / Ticket stub design */}
+              <div className={`p-1.5 rounded-sm relative shadow-md shrink-0 select-none ${isRedTheme ? 'bg-[#f4f0e6] border border-[#dcd6c5]' : 'bg-slate-900 border border-slate-800'}`}>
+                {/* Semicircle holes to simulate physical postage stamp / ticket perforations */}
+                {isRedTheme && (
+                  <>
+                    {/* Left edge holes (red matching the background red card) */}
+                    <div className="absolute left-0 top-[16%] -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
+                    <div className="absolute left-0 top-[33%] -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
+                    <div className="absolute left-0 top-[50%] -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
+                    <div className="absolute left-0 top-[66%] -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
+                    <div className="absolute left-0 top-[83%] -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
+
+                    {/* Right edge holes */}
+                    <div className="absolute right-0 top-[16%] translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
+                    <div className="absolute right-0 top-[33%] translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
+                    <div className="absolute right-0 top-[50%] translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
+                    <div className="absolute right-0 top-[66%] translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
+                    <div className="absolute right-0 top-[83%] translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
+                  </>
+                )}
+                
+                {/* Dashed frame border inside stamp */}
+                <div className={`w-full h-full p-0.5 border ${isRedTheme ? 'border-dashed border-stone-400' : 'border-slate-800'}`}>
                   <img 
                     src={data.imageUrl} 
                     alt={cleanTitle} 
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                    className="w-20 sm:w-24 aspect-[2/3] object-cover rounded-sm shadow-sm" 
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-30"></div>
                 </div>
               </div>
 
@@ -490,29 +519,37 @@ export default function LetterboxdReviewLiveCard({ url, fallbackTitle }: Letterb
               <div className="flex-grow space-y-3 text-left w-full sm:w-auto">
                 <div className="space-y-1">
                   {/* Title: Name of the film */}
-                  <h4 className="text-base font-black text-slate-100 tracking-tight leading-tight">
-                    {cleanTitle} <span className="text-xs text-slate-500 font-mono font-normal">({data.year})</span>
+                  <h4 className={`text-base font-black tracking-tight leading-tight ${isRedTheme ? 'text-white' : 'text-slate-100'}`}>
+                    {cleanTitle} <span className={`text-xs font-mono font-normal ${isRedTheme ? 'text-white/60' : 'text-slate-500'}`}>({data.year})</span>
                   </h4>
                   
                   {/* Subtitle: Directed by director of the film */}
                   {data.director && (
-                    <div className="text-[11px] text-slate-300 font-medium mt-0.5">
-                      Directed by <span className="text-indigo-400 font-semibold">{data.director}</span>
+                    <div className={`text-[11px] font-medium mt-0.5 ${isRedTheme ? 'text-white/80' : 'text-slate-350'}`}>
+                      Directed by <span className={`font-semibold ${isRedTheme ? 'text-amber-300' : 'text-indigo-400'}`}>{data.director}</span>
                     </div>
                   )}
 
                   {data.avgRating && (
                     <div className="flex items-center gap-3 pt-1">
-                      <div className="text-[10px] text-slate-500 font-mono flex items-center gap-1 bg-slate-900/50 px-1.5 py-0.5 rounded border border-slate-850">
-                        <span className="text-slate-600">Avg Rating:</span>
-                        <span className="text-slate-350 font-bold">{data.avgRating}</span>
+                      <div className={`text-[10px] font-mono flex items-center gap-1 px-1.5 py-0.5 rounded border ${
+                        isRedTheme 
+                          ? 'bg-black/20 text-white/90 border-white/10' 
+                          : 'bg-slate-900/50 text-slate-350 border-slate-850'
+                      }`}>
+                        <span className={isRedTheme ? 'text-white/60' : 'text-slate-600'}>Avg Rating:</span>
+                        <span className={`font-bold ${isRedTheme ? 'text-amber-300' : 'text-slate-350'}`}>{data.avgRating}</span>
                       </div>
                     </div>
                   )}
                 </div>
 
                 {/* Description: Text of the review */}
-                <div className="text-xs text-slate-350 italic leading-relaxed border-l-2 border-indigo-500/40 pl-3 py-0.5 whitespace-pre-line select-text">
+                <div className={`text-xs italic leading-relaxed border-l-2 pl-3 py-0.5 whitespace-pre-line select-text ${
+                  isRedTheme 
+                    ? 'text-white/90 border-amber-300/50' 
+                    : 'text-slate-350 border-indigo-500/40'
+                }`}>
                   "{data.reviewExcerpt}"
                 </div>
 
@@ -522,7 +559,11 @@ export default function LetterboxdReviewLiveCard({ url, fallbackTitle }: Letterb
                     {data.tags.map(tag => (
                       <span 
                         key={tag} 
-                        className="text-[9px] bg-indigo-950/20 text-indigo-350 hover:text-indigo-200 hover:bg-indigo-950/50 px-2 py-0.5 rounded-md border border-indigo-900/20 transition cursor-default font-mono"
+                        className={`text-[9px] px-2 py-0.5 rounded-md border transition cursor-default font-mono ${
+                          isRedTheme 
+                            ? 'bg-black/20 text-white/80 border-white/5 hover:border-white/20' 
+                            : 'bg-indigo-950/20 text-indigo-350 hover:text-indigo-200 hover:bg-indigo-950/50 border-indigo-900/20'
+                        }`}
                       >
                         #{tag.replace(/\s+/g, '-')}
                       </span>
@@ -530,17 +571,27 @@ export default function LetterboxdReviewLiveCard({ url, fallbackTitle }: Letterb
                   </div>
                 )}
 
-                <div className="flex flex-wrap items-center justify-between gap-2 text-[9px] text-slate-500 font-mono pt-2 border-t border-slate-900/50">
+                <div className={`flex flex-wrap items-center justify-between gap-2 text-[9px] font-mono pt-2 border-t ${
+                  isRedTheme ? 'border-white/10 text-white/50' : 'border-slate-900/50 text-slate-500'
+                }`}>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-slate-400">By {username}</span>
-                    {data.datePublished && <span className="text-slate-600">• {data.datePublished}</span>}
+                    <span className={`font-semibold ${isRedTheme ? 'text-white/80' : 'text-slate-400'}`}>By {username}</span>
+                    {data.datePublished && <span className={isRedTheme ? 'text-white/40' : 'text-slate-600'}>• {data.datePublished}</span>}
                     {data.likes && (
-                      <span className="text-rose-400/90 bg-rose-950/30 px-1.5 py-0.5 rounded border border-rose-900/20 font-bold flex items-center gap-1 shadow-sm">
+                      <span className={`px-1.5 py-0.5 rounded font-bold flex items-center gap-1 shadow-sm border ${
+                        isRedTheme 
+                          ? 'bg-black/20 text-rose-300 border-white/10' 
+                          : 'bg-rose-950/30 text-rose-400/90 border-rose-900/20'
+                      }`}>
                         ❤️ {data.likes}
                       </span>
                     )}
                   </div>
-                  <span className="text-[8px] bg-indigo-950/40 text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-900/30 font-mono">Parsed Live</span>
+                  <span className={`px-1.5 py-0.5 rounded border font-mono ${
+                    isRedTheme 
+                      ? 'bg-black/35 text-amber-300 border-white/5 text-[8px]' 
+                      : 'bg-indigo-950/40 text-indigo-400 border-indigo-900/30 text-[8px]'
+                  }`}>Parsed Live</span>
                 </div>
               </div>
             </div>

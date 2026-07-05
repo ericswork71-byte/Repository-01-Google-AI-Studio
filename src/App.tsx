@@ -331,10 +331,11 @@ export default function App() {
                   itemsContainer.innerHTML = items.map(function(movie) {
                     return '<a href="' + movie.link + '" target="_blank" rel="noopener noreferrer" class="group flex items-center justify-between p-2.5 rounded-lg bg-slate-950/40 border border-slate-850 hover:bg-slate-900/60 hover:border-indigo-500/40 transition duration-300 pointer-events-auto">' +
                       '<div class="flex items-center gap-3">' +
-                        '<div class="w-8 h-8 rounded-md bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 flex items-center justify-center shadow font-mono text-[10px] font-black text-indigo-400 group-hover:from-indigo-950 group-hover:to-slate-900 group-hover:text-indigo-300 transition-all duration-300">' +
-                          movie.ordinal +
+                        '<div class="w-8 h-8 rounded-md bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 flex items-center justify-center shadow text-sm group-hover:from-indigo-950 group-hover:to-slate-900 transition-all duration-300 select-none">' +
+                          '🍿' +
                         '</div>' +
                         '<span class="text-xs font-bold text-slate-200 group-hover:text-white transition-colors duration-300">' +
+                          '<span class="text-indigo-400 font-mono text-[10px] mr-1.5 font-semibold">' + movie.ordinal + '</span>' +
                           movie.title +
                         '</span>' +
                       '</div>' +
@@ -892,16 +893,16 @@ export default function App() {
     }
   </style>
 </head>
-<body class="bg-[#050508] text-slate-200 min-h-screen flex flex-col justify-between selection:bg-red-600 selection:text-white relative overflow-x-hidden">
+<body class="bg-[#050508] text-slate-200 min-h-screen flex flex-col justify-between selection:bg-red-600 selection:text-white relative overflow-x-hidden isolate">
 
   <!-- Projector Spotlight Beam -->
-  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[130vh] pointer-events-none -z-10 overflow-hidden select-none">
+  <div class="absolute top-0 bottom-[140px] left-1/2 -translate-x-1/2 w-full max-w-5xl pointer-events-none z-0 overflow-hidden select-none">
     <!-- Bright Spotlight Source -->
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-2 bg-white/95 rounded-b-full filter blur-[1px] opacity-90 shadow-[0_0_50px_rgba(255,255,255,1)] z-0"></div>
     <!-- Volumetric light cone -->
-    <div class="w-full h-full opacity-60 mix-blend-screen" style="background: linear-gradient(to bottom, rgba(255, 255, 255, 0.25) 0%, rgba(239, 68, 68, 0.06) 40%, rgba(239, 68, 68, 0.01) 80%, transparent 100%); clip-path: polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%); filter: blur(6px);"></div>
+    <div class="w-full h-full opacity-65 mix-blend-screen" style="background: linear-gradient(to bottom, rgba(255, 255, 255, 0.28) 0%, rgba(239, 68, 68, 0.08) 40%, rgba(239, 68, 68, 0.04) 80%, rgba(239, 68, 68, 0.08) 100%); clip-path: polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%); filter: blur(6px);"></div>
     <!-- Inner sharper beam of light -->
-    <div class="absolute inset-0 w-full h-full opacity-35 mix-blend-screen" style="background: linear-gradient(to bottom, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.04) 50%, transparent 100%); clip-path: polygon(48% 0%, 52% 0%, 85% 100%, 15% 100%); filter: blur(2px);"></div>
+    <div class="absolute inset-0 w-full h-full opacity-40 mix-blend-screen" style="background: linear-gradient(to bottom, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.15) 100%); clip-path: polygon(48% 0%, 52% 0%, 85% 100%, 15% 100%); filter: blur(2px);"></div>
   </div>
 
   <!-- Main Grid Page Layout -->
@@ -934,11 +935,15 @@ export default function App() {
       <div class="flex-grow h-px bg-red-950/40"></div>
     </div>
 
-    <!-- LOWER THREE FRAMES (Rearranged Layout matching Live Preview) -->
+    <!-- SECOND FRAME (Reviews - Full Width under Frame 1) -->
+    <div class="max-w-2xl w-full mx-auto mb-6">
+      ${generateFrameHTML(lowerFrame1, false, "w-full")}
+    </div>
+
+    <!-- THIRD & FOURTH FRAMES (Two Columns Layout) -->
     <section class="max-w-4xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-      ${generateFrameHTML(lowerFrame1, false, "order-1 lg:order-1 lg:col-start-1 lg:row-start-1 lg:row-span-2 h-full")}
-      ${generateFrameHTML(lowerFrame3, false, "order-3 lg:order-2 lg:col-start-2 lg:row-start-1")}
-      ${generateFrameHTML(lowerFrame2, false, "order-2 lg:order-3 lg:col-start-2 lg:row-start-2")}
+      ${generateFrameHTML(lowerFrame3, false, "w-full")}
+      ${generateFrameHTML(lowerFrame2, false, "w-full")}
     </section>
 
     <!-- Cinema Seats Row at bottom -->
@@ -2096,12 +2101,10 @@ export default function App() {
                           <div className="h-px bg-slate-800 flex-grow"></div>
                         </div>
 
-                        {/* THREE LOWER GRID FRAMES */}
-                        <div className="max-w-2xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-4">
-                          
-                          {/* FRAME 1 */}
+                        {/* FRAME 2 (Reviews - Full Width under Frame 1) */}
+                        <div className="max-w-2xl mx-auto w-full mb-4">
                           <div className="w-full bg-slate-900/60 p-4 rounded-xl border border-slate-800 hover:border-indigo-500/40 transition-all">
-                            <span className="text-[9px] font-mono text-slate-500 mb-1 block">LOWER STACK FRAME 1 (Size Equal)</span>
+                            <span className="text-[9px] font-mono text-slate-500 mb-1 block">LOWER STACK FRAME 2 (Reviews - Full Width)</span>
                             {lowerFrame1.type === 'content' && (
                               <div>
                                 {lowerFrame1.contentBody && (lowerFrame1.contentBody.includes('letterboxd.com/') || lowerFrame1.contentBody.includes('/film/')) ? (
@@ -2141,60 +2144,14 @@ export default function App() {
                               </div>
                             )}
                           </div>
+                        </div>
 
-                          {/* FRAME 2 */}
+                        {/* FRAMES 3 & 4 (Two Columns Layout) */}
+                        <div className="max-w-2xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                          
+                          {/* FRAME 3 (Reels) */}
                           <div className="w-full bg-slate-900/60 p-4 rounded-xl border border-slate-800 hover:border-indigo-500/40 transition-all">
-                            <span className="text-[9px] font-mono text-slate-500 mb-1 block">LOWER STACK FRAME 2 (Size Equal)</span>
-                            {lowerFrame2.type === 'content' && (
-                              <div>
-                                {lowerFrame2.contentBody && lowerFrame2.contentBody.includes('ranking-of-film-releases-in-spain-in-2025') ? (
-                                  <LetterboxdSpainListLiveCard 
-                                    sharedXml={sharedXml}
-                                    sharedLoading={sharedLoading}
-                                  />
-                                ) : lowerFrame2.contentBody && (lowerFrame2.contentBody.includes('letterboxd.com/') || lowerFrame2.contentBody.includes('/film/')) ? (
-                                  <LetterboxdReviewLiveCard url={lowerFrame2.contentBody} fallbackTitle={lowerFrame2.title} />
-                                ) : (
-                                  <>
-                                    <h4 className="text-xs font-bold text-white mb-1">{lowerFrame2.title}</h4>
-                                    <p className="text-xs text-slate-300 whitespace-pre-line leading-relaxed">{lowerFrame2.contentBody}</p>
-                                  </>
-                                )}
-                              </div>
-                            )}
-                            {lowerFrame2.type === 'image' && (
-                              <div className="space-y-1">
-                                <h4 className="text-xs font-bold text-white mb-1">{lowerFrame2.title}</h4>
-                                <img src={lowerFrame2.imageUrl} alt="Frame Upload Mock" className="w-full h-20 object-cover rounded" />
-                                <p className="text-[10px] text-slate-400">{lowerFrame2.contentBody}</p>
-                              </div>
-                            )}
-                            {lowerFrame2.type === 'embed_tally' && (
-                              <div>
-                                <h4 className="text-xs font-bold text-white mb-1">{lowerFrame2.title}</h4>
-                                <div className="text-[9px] font-mono bg-slate-950 p-1.5 text-emerald-400 rounded text-center">
-                                  Embedded Iframe: Yes, Active Simulation
-                                </div>
-                              </div>
-                            )}
-                            {lowerFrame2.type === 'form' && (
-                              <div className="space-y-2">
-                                <h4 className="text-xs font-bold text-white">{lowerFrame2.title}</h4>
-                                <p className="text-[11px] text-slate-400 mb-1">{lowerFrame2.contentBody}</p>
-                                <input type="email" placeholder="Your email here..." className="w-full text-xs p-2 bg-slate-950 rounded border border-slate-850 text-white focus:outline-none" />
-                                <button className="w-full bg-indigo-600 hover:bg-indigo-500 py-1 text-white font-bold text-[10px] uppercase rounded">Subscribe</button>
-                              </div>
-                            )}
-                            {lowerFrame2.type === 'custom_html' && (
-                              <div className="bg-slate-950 p-1 rounded text-[10px] font-mono text-slate-400 truncate">
-                                {lowerFrame2.contentBody}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* FRAME 3 */}
-                          <div className="w-full bg-slate-900/60 p-4 rounded-xl border border-slate-800 hover:border-indigo-500/40 transition-all">
-                            <span className="text-[9px] font-mono text-slate-500 mb-1 block">LOWER STACK FRAME 3 (Size Equal)</span>
+                            <span className="text-[9px] font-mono text-slate-500 mb-1 block">LOWER STACK FRAME 3 (Reels - Left Column)</span>
                             {lowerFrame3.type === 'content' && (
                               <div>
                                 {lowerFrame3.contentBody && lowerFrame3.contentBody.includes('if-i-can-ill-go-and-see-them-at-the-cinema') ? (
@@ -2249,6 +2206,56 @@ export default function App() {
                             {lowerFrame3.type === 'custom_html' && (
                               <div className="bg-slate-950 p-1 rounded text-[10px] font-mono text-slate-400 truncate">
                                 {lowerFrame3.contentBody}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* FRAME 4 (Spain List) */}
+                          <div className="w-full bg-slate-900/60 p-4 rounded-xl border border-slate-800 hover:border-indigo-500/40 transition-all">
+                            <span className="text-[9px] font-mono text-slate-500 mb-1 block">LOWER STACK FRAME 4 (Spain Releases - Right Column)</span>
+                            {lowerFrame2.type === 'content' && (
+                              <div>
+                                {lowerFrame2.contentBody && lowerFrame2.contentBody.includes('ranking-of-film-releases-in-spain-in-2025') ? (
+                                  <LetterboxdSpainListLiveCard 
+                                    sharedXml={sharedXml}
+                                    sharedLoading={sharedLoading}
+                                  />
+                                ) : lowerFrame2.contentBody && (lowerFrame2.contentBody.includes('letterboxd.com/') || lowerFrame2.contentBody.includes('/film/')) ? (
+                                  <LetterboxdReviewLiveCard url={lowerFrame2.contentBody} fallbackTitle={lowerFrame2.title} />
+                                ) : (
+                                  <>
+                                    <h4 className="text-xs font-bold text-white mb-1">{lowerFrame2.title}</h4>
+                                    <p className="text-xs text-slate-300 whitespace-pre-line leading-relaxed">{lowerFrame2.contentBody}</p>
+                                  </>
+                                )}
+                              </div>
+                            )}
+                            {lowerFrame2.type === 'image' && (
+                              <div className="space-y-1">
+                                <h4 className="text-xs font-bold text-white mb-1">{lowerFrame2.title}</h4>
+                                <img src={lowerFrame2.imageUrl} alt="Frame Upload Mock" className="w-full h-20 object-cover rounded" />
+                                <p className="text-[10px] text-slate-400">{lowerFrame2.contentBody}</p>
+                              </div>
+                            )}
+                            {lowerFrame2.type === 'embed_tally' && (
+                              <div>
+                                <h4 className="text-xs font-bold text-white mb-1">{lowerFrame2.title}</h4>
+                                <div className="text-[9px] font-mono bg-slate-950 p-1.5 text-emerald-400 rounded text-center">
+                                  Embedded Iframe: Yes, Active Simulation
+                                </div>
+                              </div>
+                            )}
+                            {lowerFrame2.type === 'form' && (
+                              <div className="space-y-2">
+                                <h4 className="text-xs font-bold text-white">{lowerFrame2.title}</h4>
+                                <p className="text-[11px] text-slate-400 mb-1">{lowerFrame2.contentBody}</p>
+                                <input type="email" placeholder="Your email here..." className="w-full text-xs p-2 bg-slate-950 rounded border border-slate-850 text-white focus:outline-none" />
+                                <button className="w-full bg-indigo-600 hover:bg-indigo-500 py-1 text-white font-bold text-[10px] uppercase rounded">Subscribe</button>
+                              </div>
+                            )}
+                            {lowerFrame2.type === 'custom_html' && (
+                              <div className="bg-slate-950 p-1 rounded text-[10px] font-mono text-slate-400 truncate">
+                                {lowerFrame2.contentBody}
                               </div>
                             )}
                           </div>
@@ -2541,7 +2548,7 @@ export default function App() {
 
         {/* TAB 4: PRISTINE LIVE WEBPAGE PREVIEW MODE (No developer sidebars, tools, or annotations) */}
         {activeTab === 'live-view' && (
-          <div className={`min-h-screen flex flex-col w-full relative overflow-hidden ${
+          <div className={`min-h-screen flex flex-col w-full relative overflow-hidden isolate ${
             themeColor === 'editorial' ? 'bg-[#fcfaf7] text-stone-900 font-serif' :
             themeColor === 'emerald' ? 'bg-zinc-950 text-zinc-100 font-mono' :
             themeColor === 'sunset' ? 'bg-neutral-950 text-neutral-100' :
@@ -2549,23 +2556,23 @@ export default function App() {
           }`}>
             {/* Projector Spotlight Beam */}
             {themeColor !== 'editorial' && (
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[130vh] pointer-events-none -z-10 overflow-hidden select-none">
+              <div className="absolute top-0 bottom-[140px] left-1/2 -translate-x-1/2 w-full max-w-5xl pointer-events-none z-0 overflow-hidden select-none">
                 {/* Bright Spotlight Source */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-2 bg-white/95 rounded-b-full filter blur-[1px] opacity-90 shadow-[0_0_50px_rgba(255,255,255,1)] z-0" />
                 {/* Volumetric light cone */}
                 <div 
-                  className="w-full h-full opacity-60 mix-blend-screen" 
+                  className="w-full h-full opacity-65 mix-blend-screen" 
                   style={{
-                    background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.25) 0%, rgba(239, 68, 68, 0.06) 40%, rgba(239, 68, 68, 0.01) 80%, transparent 100%)',
+                    background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.28) 0%, rgba(239, 68, 68, 0.08) 40%, rgba(239, 68, 68, 0.04) 80%, rgba(239, 68, 68, 0.08) 100%)',
                     clipPath: 'polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%)',
                     filter: 'blur(6px)'
                   }}
                 />
                 {/* Inner sharper beam of light */}
                 <div 
-                  className="absolute inset-0 w-full h-full opacity-35 mix-blend-screen" 
+                  className="absolute inset-0 w-full h-full opacity-40 mix-blend-screen" 
                   style={{
-                    background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.04) 50%, transparent 100%)',
+                    background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.15) 100%)',
                     clipPath: 'polygon(48% 0%, 52% 0%, 85% 100%, 15% 100%)',
                     filter: 'blur(2px)'
                   }}
@@ -2738,20 +2745,18 @@ export default function App() {
                   <div className={`flex-grow h-px ${themeColor === 'editorial' ? 'bg-stone-200' : 'bg-slate-900'}`}></div>
                 </div>
 
-                {/* 3. THREE LOWER FRAMES (Rearranged Layout) */}
-                <section className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-                  
-                  {/* SECOND FRAME (lowerFrame1 - Reviews) */}
-                  <div className={`rounded-2xl p-6 border border-solid transition-all order-1 lg:order-1 lg:col-start-1 lg:row-start-1 lg:row-span-2 h-full ${
+                {/* 3. SECOND FRAME (lowerFrame1 - Reviews - Full Width under Frame 1) */}
+                <div className="w-full max-w-2xl mx-auto mb-6">
+                  <div className={`rounded-2xl p-6 border border-solid transition-all ${
                     themeColor === 'editorial' ? 'bg-stone-50 border-stone-200 shadow-sm' :
                     themeColor === 'emerald' ? 'bg-zinc-900 border-zinc-850' :
                     themeColor === 'sunset' ? 'bg-neutral-900 border-neutral-850' :
-                    'bg-slate-900/60 border-slate-850 backdrop-blur shadow-2xl'
+                    'bg-[#ab0c0c] border-[#8e0909] text-white shadow-[0_0_30px_rgba(171,12,12,0.15)] shadow-2xl'
                   }`}>
                     {lowerFrame1.type === 'content' && (
                       <div>
                         {lowerFrame1.contentBody && (lowerFrame1.contentBody.includes('letterboxd.com/') || lowerFrame1.contentBody.includes('/film/')) ? (
-                          <LetterboxdReviewLiveCard url={lowerFrame1.contentBody} fallbackTitle={lowerFrame1.title} />
+                          <LetterboxdReviewLiveCard url={lowerFrame1.contentBody} fallbackTitle={lowerFrame1.title} themeColor={themeColor} />
                         ) : (
                           <>
                             <h4 className={`text-sm font-bold mb-2 ${themeColor === 'editorial' ? 'text-stone-900 font-serif' : 'text-white'}`}>{lowerFrame1.title}</h4>
@@ -2805,13 +2810,17 @@ export default function App() {
                       </div>
                     )}
                   </div>
+                </div>
 
+                {/* 4. THIRD & FOURTH FRAMES (Two Columns Layout side-by-side below Frame 2) */}
+                <section className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                  
                   {/* FOURTH FRAME (lowerFrame3 - Visual / Info) */}
-                  <div className={`rounded-2xl p-6 border border-solid transition-all order-3 lg:order-2 lg:col-start-2 lg:row-start-1 ${
+                  <div className={`rounded-2xl p-6 border border-solid transition-all ${
                     themeColor === 'editorial' ? 'bg-stone-50 border-stone-200 shadow-sm' :
                     themeColor === 'emerald' ? 'bg-zinc-900 border-zinc-850' :
                     themeColor === 'sunset' ? 'bg-neutral-900 border-neutral-850' :
-                    'bg-slate-900/60 border-slate-850 backdrop-blur shadow-2xl'
+                    'bg-[#ab0c0c] border-[#8e0909] text-white shadow-[0_0_30px_rgba(171,12,12,0.15)] shadow-2xl'
                   }`}>
                     {lowerFrame3.type === 'content' && (
                       <div>
@@ -2823,10 +2832,11 @@ export default function App() {
                               sharedLoading={sharedLoading}
                               sharedError={sharedError}
                               sharedIsReal={sharedIsReal}
+                              themeColor={themeColor}
                             />
                           </div>
                         ) : lowerFrame3.contentBody && (lowerFrame3.contentBody.includes('letterboxd.com/') || lowerFrame3.contentBody.includes('/film/')) ? (
-                          <LetterboxdReviewLiveCard url={lowerFrame3.contentBody} fallbackTitle={lowerFrame3.title} />
+                          <LetterboxdReviewLiveCard url={lowerFrame3.contentBody} fallbackTitle={lowerFrame3.title} themeColor={themeColor} />
                         ) : (
                           <>
                             <h4 className={`text-sm font-bold mb-2 ${themeColor === 'editorial' ? 'text-stone-900 font-serif' : 'text-white'}`}>{lowerFrame3.title}</h4>
@@ -2882,11 +2892,11 @@ export default function App() {
                   </div>
 
                   {/* THIRD FRAME (lowerFrame2 - Spain Film Releases) */}
-                  <div className={`rounded-2xl p-6 border border-solid transition-all order-2 lg:order-3 lg:col-start-2 lg:row-start-2 ${
+                  <div className={`rounded-2xl p-6 border border-solid transition-all ${
                     themeColor === 'editorial' ? 'bg-stone-50 border-stone-200 shadow-sm' :
                     themeColor === 'emerald' ? 'bg-zinc-900 border-zinc-850' :
                     themeColor === 'sunset' ? 'bg-neutral-900 border-neutral-850' :
-                    'bg-slate-900/60 border-slate-850 backdrop-blur shadow-2xl'
+                    'bg-[#ab0c0c] border-[#8e0909] text-white shadow-[0_0_30px_rgba(171,12,12,0.15)] shadow-2xl'
                   }`}>
                     {lowerFrame2.type === 'content' && (
                       <div>
@@ -2896,10 +2906,11 @@ export default function App() {
                             <LetterboxdSpainListLiveCard 
                               sharedXml={sharedXml}
                               sharedLoading={sharedLoading}
+                              themeColor={themeColor}
                             />
                           </div>
                         ) : lowerFrame2.contentBody && (lowerFrame2.contentBody.includes('letterboxd.com/') || lowerFrame2.contentBody.includes('/film/')) ? (
-                          <LetterboxdReviewLiveCard url={lowerFrame2.contentBody} fallbackTitle={lowerFrame2.title} />
+                          <LetterboxdReviewLiveCard url={lowerFrame2.contentBody} fallbackTitle={lowerFrame2.title} themeColor={themeColor} />
                         ) : (
                           <>
                             <h4 className={`text-sm font-bold mb-2 ${themeColor === 'editorial' ? 'text-stone-900 font-serif' : 'text-white'}`}>{lowerFrame2.title}</h4>

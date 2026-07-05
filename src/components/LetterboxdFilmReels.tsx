@@ -37,13 +37,15 @@ interface LetterboxdFilmReelsProps {
   sharedLoading?: boolean;
   sharedError?: string | null;
   sharedIsReal?: boolean;
+  themeColor?: string;
 }
 
 export default function LetterboxdFilmReels({
   sharedXml,
   sharedLoading,
   sharedError,
-  sharedIsReal
+  sharedIsReal,
+  themeColor
 }: LetterboxdFilmReelsProps = {}) {
   const [films, setFilms] = useState<FilmReelItem[]>(CINEMA_FALLBACK_LIST);
   const [loading, setLoading] = useState<boolean>(true);
@@ -84,7 +86,7 @@ export default function LetterboxdFilmReels({
         rotate,
         scale,
         zIndex,
-        tiltX: 81, // Sharp 3D tilt: thin edge side view
+        tiltX: 0, // Face-on flat view
         tiltY: 0
       });
     }
@@ -109,9 +111,9 @@ export default function LetterboxdFilmReels({
       // Spin the reels randomly
       const rotate = (i * 73 + Math.floor(Math.sin(i * 3) * 20)) % 360;
       
-      // Simulated perspective 3D tilt: flatter near the back, tilted in front
-      const tiltX = 40 + (Math.sin(i) * 10); // flat angled
-      const tiltY = (Math.cos(i) * 5);
+      // Face-on flat view across the studio floor
+      const tiltX = 0;
+      const tiltY = 0;
 
       // Back elements are smaller, front are bigger
       // Normalized Y: smaller value means higher up (deeper back on floor)
@@ -407,6 +409,93 @@ export default function LetterboxdFilmReels({
     );
   }
 
+  if (themeColor === 'slate' || !themeColor) {
+    const gridFilms = films.slice(0, 6);
+    return (
+      <div className="w-full text-center space-y-4">
+        <div className="relative bg-black/25 rounded-2xl p-6 border border-white/5 overflow-hidden shadow-inner">
+          {/* Horizontal divider white/light line in the middle */}
+          <div className="absolute top-1/2 left-4 right-4 h-px bg-white/10 -translate-y-1/2 pointer-events-none" />
+          
+          <div className="grid grid-cols-3 gap-y-10 gap-x-6 relative py-3">
+            {gridFilms.map((movie, index) => {
+              const isHovered = activeReelIndex === index;
+              return (
+                <div 
+                  key={index}
+                  className="flex flex-col items-center justify-center relative group"
+                  onMouseEnter={() => setActiveReelIndex(index)}
+                  onMouseLeave={() => setActiveReelIndex(null)}
+                >
+                  <a
+                    href={movie.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-105 group-hover:rotate-45 pointer-events-auto shadow-[0_8px_20px_rgba(0,0,0,0.6)]"
+                    style={{
+                      background: 'radial-gradient(circle at 35% 35%, #e2e8f0 0%, #cbd5e1 50%, #94a3b8 100%)',
+                      border: '4px solid #f1f5f9'
+                    }}
+                  >
+                    {/* Concentric rolled tape lines */}
+                    <div className="absolute inset-1.5 rounded-full border border-slate-700/30 bg-slate-900/90 pointer-events-none" />
+                    
+                    <svg className="absolute inset-0 w-full h-full text-slate-950/80 opacity-60 pointer-events-none" viewBox="0 0 100 100">
+                      <circle cx="50" cy="50" r="38" stroke="currentColor" strokeWidth="4" strokeDasharray="1,1" />
+                      <circle cx="50" cy="50" r="30" stroke="currentColor" strokeWidth="3" strokeDasharray="2,1" />
+                    </svg>
+
+                    {/* Spoke lines & 5 holes */}
+                    <svg 
+                      className="absolute inset-0 w-full h-full text-slate-700 pointer-events-none"
+                      viewBox="0 0 100 100" 
+                      fill="none" 
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle cx="50" cy="50" r="46" stroke="currentColor" strokeWidth="2.5" />
+                      <line x1="50" y1="50" x2="50" y2="4" stroke="currentColor" strokeWidth="2.5" />
+                      <line x1="50" y1="50" x2="93.8" y2="31.3" stroke="currentColor" strokeWidth="2.5" />
+                      <line x1="50" y1="50" x2="77.1" y2="75.6" stroke="currentColor" strokeWidth="2.5" />
+                      <line x1="50" y1="50" x2="22.9" y2="75.6" stroke="currentColor" strokeWidth="2.5" />
+                      <line x1="50" y1="50" x2="6.2" y2="31.3" stroke="currentColor" strokeWidth="2.5" />
+                      
+                      {/* 5 Holes cutouts */}
+                      <circle cx="50" cy="22" r="6" fill="#000000" stroke="currentColor" strokeWidth="1" />
+                      <circle cx="74" cy="39" r="6" fill="#000000" stroke="currentColor" strokeWidth="1" />
+                      <circle cx="65" cy="69" r="6" fill="#000000" stroke="currentColor" strokeWidth="1" />
+                      <circle cx="35" cy="69" r="6" fill="#000000" stroke="currentColor" strokeWidth="1" />
+                      <circle cx="26" cy="39" r="6" fill="#000000" stroke="currentColor" strokeWidth="1" />
+                    </svg>
+
+                    {/* Spindle center */}
+                    <div className="absolute w-4 h-4 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 rounded-full bg-black" />
+                    </div>
+                  </a>
+
+                  {/* Elegant hover title bubble */}
+                  <div className={`absolute top-[85%] z-30 bg-black/95 text-white border border-white/10 px-2 py-1 rounded shadow-xl text-[10px] font-sans pointer-events-none transition-all duration-300 max-w-[120px] text-center ${
+                    isHovered ? 'opacity-100 scale-100 translate-y-1' : 'opacity-0 scale-90 translate-y-0'
+                  }`}>
+                    <p className="font-bold truncate">{movie.title}</p>
+                    {movie.year && <p className="text-[8px] text-slate-400">({movie.year})</p>}
+                    <p className="text-[7px] text-amber-400 font-mono tracking-wider mt-0.5">OPEN LINK ↗</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Info label below */}
+        <div className="flex items-center justify-between text-[9px] text-white/50 font-mono pt-1">
+          <span>Flat Face-On Cinema Reels</span>
+          <span>Source: Frédéric's Letterboxd RSS</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full text-left font-sans space-y-4">
       {error && (
@@ -534,12 +623,12 @@ export default function LetterboxdFilmReels({
                 <ReelContainer {...containerProps}>
                   
                   {/* Internal concentric circles simulating rolled movie tape strip inside (faded when flat) */}
-                  <div className="absolute inset-2 rounded-full border-2 border-[#151c2c] bg-[#070b14] pointer-events-none transition-opacity duration-500" style={{ opacity: isActive ? 1.0 : 0.25 }} />
-                  <div className="absolute inset-4 rounded-full border border-dashed border-slate-950 pointer-events-none transition-opacity duration-500" style={{ opacity: isActive ? 0.9 : 0.1 }} />
-                  <div className="absolute inset-5 rounded-full border border-[#1b253b] pointer-events-none transition-opacity duration-500" style={{ opacity: isActive ? 0.8 : 0.15 }} />
+                  <div className="absolute inset-2 rounded-full border-2 border-[#151c2c] bg-[#070b14] pointer-events-none transition-opacity duration-500" style={{ opacity: isActive ? 1.0 : 0.8 }} />
+                  <div className="absolute inset-4 rounded-full border border-dashed border-slate-950 pointer-events-none transition-opacity duration-500" style={{ opacity: isActive ? 0.9 : 0.6 }} />
+                  <div className="absolute inset-5 rounded-full border border-[#1b253b] pointer-events-none transition-opacity duration-500" style={{ opacity: isActive ? 0.8 : 0.5 }} />
                   
                   {/* Concentric rings of fine-grain film tape lines */}
-                  <svg className="absolute inset-0 w-full h-full text-slate-950 opacity-70 pointer-events-none transition-opacity duration-500" style={{ opacity: isActive ? 0.7 : 0.1 }} viewBox="0 0 100 100">
+                  <svg className="absolute inset-0 w-full h-full text-slate-950 opacity-70 pointer-events-none transition-opacity duration-500" style={{ opacity: isActive ? 0.7 : 0.4 }} viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="38" stroke="currentColor" strokeWidth="6" strokeDasharray="1,1" />
                     <circle cx="50" cy="50" r="30" stroke="currentColor" strokeWidth="5" strokeDasharray="2,1" />
                     <circle cx="50" cy="50" r="22" stroke="#111827" strokeWidth="4" />
@@ -547,8 +636,8 @@ export default function LetterboxdFilmReels({
 
                   {/* SVG Spool spokes overlay rotates with kinetic motion */}
                   <svg 
-                    className="absolute inset-0 w-full h-full text-slate-800 pointer-events-none transition-all duration-700 ease-out group-hover:rotate-45" 
-                    style={{ opacity: isActive ? 1.0 : 0.2 }}
+                    className="absolute inset-0 w-full h-full text-slate-700 pointer-events-none transition-all duration-700 ease-out group-hover:rotate-45" 
+                    style={{ opacity: isActive ? 1.0 : 0.75 }}
                     viewBox="0 0 100 100" 
                     fill="none" 
                     xmlns="http://www.w3.org/2000/svg"
@@ -577,20 +666,23 @@ export default function LetterboxdFilmReels({
                   </div>
 
                   {/* Adhesive labeling paper tape sticker wrapped across the reel face */}
-                  {/* Displaying ONLY the movie title, completely hidden when flat to look like a clean metal stack */}
                   <div 
                     className={`absolute z-20 px-2 py-1.5 max-w-[84px] text-center rounded-sm transition-all duration-500 select-none shadow border flex flex-col items-center justify-center gap-0.5 ${
                       isActive 
-                        ? 'bg-amber-50 border-amber-300 text-slate-950 rotate-0 scale-105 shadow-md opacity-100 scale-100 pointer-events-auto' 
-                        : 'bg-[#faf8f2] border-[#e2dccb] text-slate-900 -rotate-3 opacity-0 scale-50 pointer-events-none'
+                        ? 'bg-amber-100 border-amber-300 text-slate-950 rotate-0 scale-105 shadow-md opacity-100 pointer-events-auto' 
+                        : 'bg-[#faf8f2]/95 border-[#e2dccb] text-slate-900 -rotate-3 opacity-90 scale-95 pointer-events-auto'
                     }`}
                   >
-                    <p className={`text-[8px] sm:text-[9px] font-mono font-black line-clamp-2 uppercase tracking-tighter leading-tight text-center ${isActive ? 'text-indigo-950' : ''}`}>
+                    <p className={`text-[8px] sm:text-[9px] font-mono font-black line-clamp-2 uppercase tracking-tighter leading-tight text-center ${isActive ? 'text-indigo-950' : 'text-slate-800'}`}>
                       {movie.title}
                     </p>
-                    {isActive && (
+                    {isActive ? (
                       <span className="text-[6px] text-indigo-600 font-bold tracking-widest uppercase flex items-center gap-0.5 mt-0.5 animate-pulse">
                         OPEN ↗
+                      </span>
+                    ) : (
+                      <span className="text-[5.5px] text-slate-400 font-bold tracking-widest uppercase flex items-center gap-0.5 mt-0.2">
+                        REEL
                       </span>
                     )}
                   </div>

@@ -18,16 +18,20 @@ const FALLBACK_LIST: MovieListItem[] = [
 interface LetterboxdSpainListLiveCardProps {
   sharedXml?: string | null;
   sharedLoading?: boolean;
+  themeColor?: string;
 }
 
 export default function LetterboxdSpainListLiveCard({
   sharedXml,
-  sharedLoading
+  sharedLoading,
+  themeColor
 }: LetterboxdSpainListLiveCardProps = {}) {
   const [items, setItems] = useState<MovieListItem[]>(FALLBACK_LIST);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isLive, setIsLive] = useState<boolean>(false);
+
+  const isRedTheme = !themeColor || themeColor === 'slate';
 
   const getOrdinalStr = (index: number): string => {
     const suffixes = ["th", "st", "nd", "rd"];
@@ -161,13 +165,13 @@ export default function LetterboxdSpainListLiveCard({
 
   return (
     <div id="spain-2025-ranking-card" className="space-y-4 text-left">
-      <div className="flex items-center justify-between border-b border-slate-900 pb-2.5">
+      <div className={`flex items-center justify-between border-b pb-2.5 ${isRedTheme ? 'border-white/10' : 'border-slate-900'}`}>
         <div 
           className="flex items-center gap-2 relative group cursor-help select-none"
           title="films released in Spain in 2025 that I have seen until 31/1/2026"
         >
-          <Award className="w-4 h-4 text-amber-500 animate-pulse shrink-0" />
-          <h4 className="text-xs font-bold text-slate-100 uppercase tracking-wider font-mono">
+          <Award className={`w-4 h-4 animate-pulse shrink-0 ${isRedTheme ? 'text-amber-300' : 'text-amber-500'}`} />
+          <h4 className={`text-xs font-bold uppercase tracking-wider font-mono ${isRedTheme ? 'text-white' : 'text-slate-100'}`}>
             My best of 2025
           </h4>
           
@@ -184,7 +188,11 @@ export default function LetterboxdSpainListLiveCard({
               <span>Syncing...</span>
             </div>
           ) : (
-            <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-500">
+            <span className={`text-[9px] font-mono px-2 py-0.5 rounded border ${
+              isRedTheme 
+                ? 'bg-black/20 border-white/10 text-white/70' 
+                : 'bg-slate-950 border-slate-800 text-slate-500'
+            }`}>
               {isLive ? "Live Sync 🟢" : "Offline 🔒"}
             </span>
           )}
@@ -198,20 +206,25 @@ export default function LetterboxdSpainListLiveCard({
             href={movie.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex items-center justify-between p-2.5 rounded-lg bg-slate-950/40 border border-slate-850 hover:bg-slate-900/60 hover:border-indigo-500/40 transition duration-300 pointer-events-auto"
+            className={`group flex items-center justify-between p-2.5 rounded-lg border transition duration-300 pointer-events-auto ${
+              isRedTheme 
+                ? 'bg-black/20 border-white/5 hover:bg-black/35 hover:border-white/20 text-white' 
+                : 'bg-slate-950/40 border-slate-850 hover:bg-slate-900/60 hover:border-indigo-500/40 text-slate-200'
+            }`}
             id={`spain-ranking-item-${index + 1}`}
           >
-            <div className="flex items-center gap-3">
-              {/* Custom metallic/glass badging for ordinals */}
-              <div className="w-8 h-8 rounded-md bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 flex items-center justify-center shadow font-mono text-[10px] font-black text-indigo-400 group-hover:from-indigo-950 group-hover:to-slate-900 group-hover:text-indigo-300 transition-all duration-300">
-                {movie.ordinal}
-              </div>
-              <span className="text-xs font-bold text-slate-200 group-hover:text-white transition-colors duration-300">
+            <div className="flex items-center gap-2">
+              {/* Custom simple popcorn bullet directly at the beginning of each list item */}
+              <span className="text-base select-none shrink-0 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] animate-bounce" style={{ animationDelay: `${index * 150}ms`, animationDuration: '3s' }}>
+                🍿
+              </span>
+              <span className={`text-xs font-bold transition-colors duration-300 ${isRedTheme ? 'text-white' : 'text-slate-200 group-hover:text-white'}`}>
+                <span className={`font-mono text-[10px] mr-1.5 font-semibold ${isRedTheme ? 'text-amber-300' : 'text-indigo-400'}`}>{movie.ordinal}</span>
                 {movie.title}
               </span>
             </div>
             
-            <div className="flex items-center gap-1 text-[10px] text-slate-500 group-hover:text-indigo-400 transition-colors font-mono">
+            <div className={`flex items-center gap-1 text-[10px] transition-colors font-mono ${isRedTheme ? 'text-white/40 group-hover:text-amber-300' : 'text-slate-500 group-hover:text-indigo-400'}`}>
               <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[9px]">letterboxd</span>
               <ExternalLink className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </div>
@@ -219,16 +232,16 @@ export default function LetterboxdSpainListLiveCard({
         ))}
       </div>
 
-      <div className="flex items-center justify-between pt-2 border-t border-slate-900 text-[9px] text-slate-500 font-mono">
+      <div className={`flex items-center justify-between pt-2 border-t text-[9px] font-mono ${isRedTheme ? 'border-white/10 text-white/50' : 'border-slate-900 text-slate-500'}`}>
         <span className="flex items-center gap-1">
-          <ListVideo className="w-3 h-3 text-slate-600" />
+          <ListVideo className={`w-3 h-3 ${isRedTheme ? 'text-white/40' : 'text-slate-600'}`} />
           <span>Source: Frédéric's Letterboxd List</span>
         </span>
         <a 
           href="https://letterboxd.com/erics71/list/ranking-of-film-releases-in-spain-in-2025/" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="hover:text-slate-350 hover:underline flex items-center gap-0.5"
+          className={`hover:underline flex items-center gap-0.5 ${isRedTheme ? 'text-white/70 hover:text-white' : 'hover:text-slate-350'}`}
         >
           Full List ↗
         </a>
