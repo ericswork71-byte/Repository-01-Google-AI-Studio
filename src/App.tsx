@@ -801,7 +801,7 @@ export default function App() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Another day dreaming</title>
+  <title>Anotherr day dreaming</title>
   
   <!-- Tailwind Play CDN - Fully integrated client layout with zero install required -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -810,7 +810,7 @@ export default function App() {
       theme: {
         extend: {
           colors: {
-            brandAccent: '#6366f1',
+            brandAccent: '#dc2626',
           }
         }
       }
@@ -828,21 +828,85 @@ export default function App() {
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-200 min-h-screen flex flex-col justify-between selection:bg-indigo-600 selection:text-white">
+<body class="bg-[#050508] text-slate-200 min-h-screen flex flex-col justify-between selection:bg-red-600 selection:text-white relative overflow-x-hidden">
 
-  <!-- Minimal Decorative background elements -->
-  <div class="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.12),transparent_50%)]"></div>
+  <!-- Projector Spotlight Beam -->
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[130vh] pointer-events-none -z-10 overflow-hidden">
+    <div class="w-full h-full opacity-40 mix-blend-screen" style="background: linear-gradient(to bottom, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.04) 50%, rgba(255, 255, 255, 0) 100%); clip-path: polygon(48% 0%, 52% 0%, 100% 100%, 0% 100%);"></div>
+  </div>
 
   <!-- Main Grid Page Layout -->
-  <div class="max-w-4xl w-full mx-auto px-6 py-12 flex-grow flex flex-col gap-8 justify-center">
+  <div class="max-w-4xl w-full mx-auto px-6 py-12 flex-grow flex flex-col gap-8 justify-center relative z-10">
     
-    <!-- HEADER INTRO BAR -->
-    <header class="text-center space-y-2 mb-2">
-      <div class="inline-flex items-center gap-2 px-3 py-1 bg-indigo-950/50 border border-indigo-900/60 rounded-full text-indigo-400 text-xs font-mono">
-        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Live Published Page
+    <!-- HEADER INTRO BAR (Cinema & Review Journal Theme) -->
+    <header class="text-center space-y-3 mb-6">
+      <div class="text-[11px] uppercase tracking-[0.25em] font-black text-red-500 font-mono">
+        Cinema &amp; Review Journal
       </div>
-      <h1 class="text-3xl font-black text-white tracking-tight">Another day dreaming</h1>
-      <p class="text-sm text-slate-400 max-w-md mx-auto">This responsive web page combines an upper centered frame with three lower sections arranged side-by-side.</p>
+      <h1 class="text-4xl md:text-5xl font-black text-red-600 tracking-tighter uppercase filter drop-shadow-[0_0_12px_rgba(239,68,68,0.75)] font-sans" style="font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;">
+        Anotherr day dreaming
+      </h1>
+      <p class="text-xs text-red-700/80 max-w-md mx-auto font-semibold tracking-wide">
+        A hand-crafted projection of cinematic logs, live diaries, and review cards.
+      </p>
+
+      <!-- Beautiful Film Strip -->
+      <div class="w-full max-w-[440px] mx-auto bg-[#07070a] border-[3px] border-[#1c1c22] rounded-lg p-2.5 relative shadow-[0_12px_30px_rgba(0,0,0,0.9)] z-10 my-4">
+        <!-- Sprocket holes top -->
+        <div class="flex justify-between px-0.5 mb-1.5 opacity-55">
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+        </div>
+        <!-- Film cells -->
+        <div class="grid grid-cols-5 gap-2 h-14 bg-stone-950 p-1 rounded">
+          <div class="bg-gradient-to-b from-white/12 to-white/0 border border-white/5 rounded flex items-center justify-center">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/5"></div>
+          </div>
+          <div class="bg-gradient-to-b from-white/12 to-white/0 border border-white/5 rounded flex items-center justify-center">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/5"></div>
+          </div>
+          <div class="bg-gradient-to-b from-white/12 to-white/0 border border-white/5 rounded flex items-center justify-center">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/5"></div>
+          </div>
+          <div class="bg-gradient-to-b from-white/12 to-white/0 border border-white/5 rounded flex items-center justify-center">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/5"></div>
+          </div>
+          <div class="bg-gradient-to-b from-white/12 to-white/0 border border-white/5 rounded flex items-center justify-center">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/5"></div>
+          </div>
+        </div>
+        <!-- Sprocket holes bottom -->
+        <div class="flex justify-between px-0.5 mt-1.5 opacity-55">
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+          <div class="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+        </div>
+      </div>
     </header>
 
     <!-- UPPER ROW (Occupies the Middle section horizontally) -->
@@ -852,9 +916,9 @@ export default function App() {
 
     <!-- DIVISION SEPARATOR -->
     <div class="w-full max-w-2xl mx-auto flex items-center gap-3">
-      <div class="flex-grow h-px bg-slate-900"></div>
-      <span class="text-[10px] font-mono text-slate-600 uppercase tracking-widest">Lower Stack Elements Grid</span>
-      <div class="flex-grow h-px bg-slate-900"></div>
+      <div class="flex-grow h-px bg-red-950/40"></div>
+      <span class="text-[10px] font-mono text-red-500 uppercase tracking-widest font-black">Lower Stack Elements Grid</span>
+      <div class="flex-grow h-px bg-red-950/40"></div>
     </div>
 
     <!-- LOWER THREE FRAMES (Rearranged Layout matching Live Preview) -->
@@ -864,7 +928,115 @@ export default function App() {
       ${generateFrameHTML(lowerFrame2, false, "order-2 lg:order-3 lg:col-start-2 lg:row-start-2")}
     </section>
 
-    <footer class="text-center text-[11px] text-slate-500 border-t border-slate-900 pt-8 mt-4 space-y-1">
+    <!-- Cinema Seats Row at bottom -->
+    <div class="w-full overflow-hidden mt-10 select-none pointer-events-none">
+      <svg viewBox="0 0 1000 120" class="w-full h-auto text-red-700" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <g>
+          <g transform="translate(0, 10)">
+            <path d="M10,75 Q10,95 25,95 L75,95 Q90,95 90,75 L90,65 L10,65 Z" fill="#9a0000" />
+            <rect x="15" y="10" width="70" height="65" rx="12" fill="#d60000" />
+            <rect x="30" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="48" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="66" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="5" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="85" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="45" y="94" width="10" height="20" fill="#2a0000" />
+          </g>
+          <g transform="translate(100, 10)">
+            <path d="M10,75 Q10,95 25,95 L75,95 Q90,95 90,75 L90,65 L10,65 Z" fill="#9a0000" />
+            <rect x="15" y="10" width="70" height="65" rx="12" fill="#d60000" />
+            <rect x="30" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="48" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="66" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="5" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="85" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="45" y="94" width="10" height="20" fill="#2a0000" />
+          </g>
+          <g transform="translate(200, 10)">
+            <path d="M10,75 Q10,95 25,95 L75,95 Q90,95 90,75 L90,65 L10,65 Z" fill="#9a0000" />
+            <rect x="15" y="10" width="70" height="65" rx="12" fill="#d60000" />
+            <rect x="30" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="48" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="66" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="5" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="85" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="45" y="94" width="10" height="20" fill="#2a0000" />
+          </g>
+          <g transform="translate(300, 10)">
+            <path d="M10,75 Q10,95 25,95 L75,95 Q90,95 90,75 L90,65 L10,65 Z" fill="#9a0000" />
+            <rect x="15" y="10" width="70" height="65" rx="12" fill="#d60000" />
+            <rect x="30" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="48" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="66" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="5" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="85" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="45" y="94" width="10" height="20" fill="#2a0000" />
+          </g>
+          <g transform="translate(400, 10)">
+            <path d="M10,75 Q10,95 25,95 L75,95 Q90,95 90,75 L90,65 L10,65 Z" fill="#9a0000" />
+            <rect x="15" y="10" width="70" height="65" rx="12" fill="#d60000" />
+            <rect x="30" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="48" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="66" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="5" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="85" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="45" y="94" width="10" height="20" fill="#2a0000" />
+          </g>
+          <g transform="translate(500, 10)">
+            <path d="M10,75 Q10,95 25,95 L75,95 Q90,95 90,75 L90,65 L10,65 Z" fill="#9a0000" />
+            <rect x="15" y="10" width="70" height="65" rx="12" fill="#d60000" />
+            <rect x="30" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="48" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="66" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="5" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="85" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="45" y="94" width="10" height="20" fill="#2a0000" />
+          </g>
+          <g transform="translate(600, 10)">
+            <path d="M10,75 Q10,95 25,95 L75,95 Q90,95 90,75 L90,65 L10,65 Z" fill="#9a0000" />
+            <rect x="15" y="10" width="70" height="65" rx="12" fill="#d60000" />
+            <rect x="30" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="48" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="66" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="5" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="85" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="45" y="94" width="10" height="20" fill="#2a0000" />
+          </g>
+          <g transform="translate(700, 10)">
+            <path d="M10,75 Q10,95 25,95 L75,95 Q90,95 90,75 L90,65 L10,65 Z" fill="#9a0000" />
+            <rect x="15" y="10" width="70" height="65" rx="12" fill="#d60000" />
+            <rect x="30" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="48" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="66" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="5" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="85" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="45" y="94" width="10" height="20" fill="#2a0000" />
+          </g>
+          <g transform="translate(800, 10)">
+            <path d="M10,75 Q10,95 25,95 L75,95 Q90,95 90,75 L90,65 L10,65 Z" fill="#9a0000" />
+            <rect x="15" y="10" width="70" height="65" rx="12" fill="#d60000" />
+            <rect x="30" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="48" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="66" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="5" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="85" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="45" y="94" width="10" height="20" fill="#2a0000" />
+          </g>
+          <g transform="translate(900, 10)">
+            <path d="M10,75 Q10,95 25,95 L75,95 Q90,95 90,75 L90,65 L10,65 Z" fill="#9a0000" />
+            <rect x="15" y="10" width="70" height="65" rx="12" fill="#d60000" />
+            <rect x="30" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="48" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="66" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+            <rect x="5" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="85" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+            <rect x="45" y="94" width="10" height="20" fill="#2a0000" />
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <footer class="text-center text-[11px] text-red-900/60 border-t border-red-950/20 pt-8 mt-4 space-y-1">
       <p>© \${new Date().getFullYear()} Centered 4-Frame Site. Constructed entirely free.</p>
       <p class="font-mono text-[10px]">Hosted securely with 100% zero hosting costs via free platforms.</p>
     </footer>
@@ -2356,12 +2528,25 @@ export default function App() {
 
         {/* TAB 4: PRISTINE LIVE WEBPAGE PREVIEW MODE (No developer sidebars, tools, or annotations) */}
         {activeTab === 'live-view' && (
-          <div className={`min-h-screen flex flex-col w-full ${
+          <div className={`min-h-screen flex flex-col w-full relative overflow-hidden ${
             themeColor === 'editorial' ? 'bg-[#fcfaf7] text-stone-900 font-serif' :
             themeColor === 'emerald' ? 'bg-zinc-950 text-zinc-100 font-mono' :
             themeColor === 'sunset' ? 'bg-neutral-950 text-neutral-100' :
-            'bg-slate-950 text-slate-100 font-sans'
+            'bg-[#050508] text-slate-100 font-sans'
           }`}>
+            {/* Projector Spotlight Beam */}
+            {themeColor !== 'editorial' && (
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[130vh] pointer-events-none -z-10 overflow-hidden">
+                <div 
+                  className="w-full h-full opacity-40 mix-blend-screen" 
+                  style={{
+                    background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.04) 50%, rgba(255, 255, 255, 0) 100%)',
+                    clipPath: 'polygon(48% 0%, 52% 0%, 100% 100%, 0% 100%)'
+                  }}
+                />
+              </div>
+            )}
+
             {/* Elegant Sticky Preview Action Bar */}
             {!isPureProductionView && (
               <div className="bg-slate-950 border-b border-slate-900 px-4 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50 shadow-xl backdrop-blur-md bg-opacity-95">
@@ -2401,35 +2586,58 @@ export default function App() {
             )}
 
             {/* Pristine 4-Frame Webpage Stage */}
-            <div className="flex-grow py-12 px-4 md:px-8 max-w-5xl mx-auto w-full relative">
+            <div className="flex-grow py-12 px-4 md:px-8 max-w-5xl mx-auto w-full relative z-10">
               
-              {/* Subtle Ambient Radial Glow */}
-              {themeColor !== 'editorial' && (
-                <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.06),transparent_50%)]"></div>
-              )}
-
               <div className="space-y-12">
                 
                 {/* 1. Brand Site Header */}
-                <header className="text-center space-y-2 mb-10">
-                  <span className={`text-[9px] uppercase tracking-widest font-mono border px-3 py-1 rounded-full inline-block ${
-                    themeColor === 'editorial' ? 'text-stone-700 border-stone-300 bg-stone-100' :
-                    themeColor === 'emerald' ? 'text-emerald-400 border-emerald-900 bg-emerald-950/30' :
-                    themeColor === 'sunset' ? 'text-orange-400 border-orange-950 bg-orange-950/30' :
-                    'text-indigo-400 border-indigo-900 bg-indigo-950/30'
-                  }`}>
-                    Cinema &amp; Review Journal
-                  </span>
-                  <h1 className={`text-2xl md:text-3xl font-extrabold tracking-tight ${
-                    themeColor === 'editorial' ? 'text-stone-900 font-serif' : 'text-white font-sans'
-                  }`}>
-                    Another day dreaming
-                  </h1>
-                  <p className={`text-xs max-w-md mx-auto ${
-                    themeColor === 'editorial' ? 'text-stone-600' : 'text-slate-400'
-                  }`}>
-                    This responsive web page combines an upper centered frame with three lower sections arranged side-by-side.
-                  </p>
+                <header className="text-center space-y-3 mb-10">
+                  {themeColor === 'editorial' ? (
+                    <>
+                      <span className="text-[9px] uppercase tracking-widest font-mono border px-3 py-1 rounded-full inline-block text-stone-700 border-stone-300 bg-stone-100">
+                        Cinema &amp; Review Journal
+                      </span>
+                      <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-stone-900 font-serif">
+                        Anotherr day dreaming
+                      </h1>
+                      <p className="text-xs max-w-md mx-auto text-stone-600">
+                        This responsive web page combines an upper centered frame with three lower sections arranged side-by-side.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-[11px] uppercase tracking-[0.25em] font-black text-red-500 font-mono">
+                        Cinema &amp; Review Journal
+                      </div>
+                      <h1 className="text-4xl md:text-5xl font-black text-red-600 tracking-tighter uppercase filter drop-shadow-[0_0_12px_rgba(239,68,68,0.75)] font-sans" style={{ fontFamily: "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif" }}>
+                        Anotherr day dreaming
+                      </h1>
+                      <p className="text-xs text-red-700/80 max-w-md mx-auto font-semibold tracking-wide">
+                        A hand-crafted projection of cinematic logs, live diaries, and review cards.
+                      </p>
+
+                      {/* Beautiful Film Strip Graphic */}
+                      <div className="w-full max-w-[440px] mx-auto bg-[#07070a] border-[3px] border-[#1c1c22] rounded-lg p-2.5 relative shadow-[0_12px_30px_rgba(0,0,0,0.9)] z-10 my-4">
+                        <div className="flex justify-between px-0.5 mb-1.5 opacity-55">
+                          {Array.from({ length: 15 }).map((_, i) => (
+                            <div key={i} className="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-5 gap-2 h-14 bg-stone-950 p-1 rounded">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <div key={i} className="bg-gradient-to-b from-white/12 to-white/0 border border-white/5 rounded flex items-center justify-center">
+                              <div className="w-1.5 h-1.5 rounded-full bg-white/5"></div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="flex justify-between px-0.5 mt-1.5 opacity-55">
+                          {Array.from({ length: 15 }).map((_, i) => (
+                            <div key={i} className="w-2.5 h-1.5 bg-stone-500/70 rounded-sm"></div>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </header>
 
                 {/* 2. UPPER CENTERED FRAME CONTAINER */}
@@ -2740,6 +2948,28 @@ export default function App() {
                   </div>
 
                 </section>
+
+                {/* Cinema Seats Row at bottom */}
+                {themeColor !== 'editorial' && (
+                  <div className="w-full overflow-hidden mt-10 select-none pointer-events-none">
+                    <svg viewBox="0 0 1000 120" className="w-full h-auto text-red-700" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <g>
+                        {Array.from({ length: 10 }).map((_, i) => (
+                          <g key={i} transform={`translate(${i * 100}, 10)`}>
+                            <path d="M10,75 Q10,95 25,95 L75,95 Q90,95 90,75 L90,65 L10,65 Z" fill="#9a0000" />
+                            <rect x="15" y="10" width="70" height="65" rx="12" fill="#d60000" />
+                            <rect x="30" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+                            <rect x="48" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+                            <rect x="66" y="22" width="5" height="40" rx="2" fill="#7a0000" />
+                            <rect x="5" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+                            <rect x="85" y="48" width="10" height="28" rx="5" fill="#6d0000" />
+                            <rect x="45" y="94" width="10" height="20" fill="#2a0000" />
+                          </g>
+                        ))}
+                      </g>
+                    </svg>
+                  </div>
+                )}
 
               </div>
 
