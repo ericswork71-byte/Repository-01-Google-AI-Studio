@@ -19,17 +19,21 @@ interface ReelLayout {
   tiltY: number;
 }
 
+const decodeEntities = (str: string): string => {
+  if (!str) return "";
+  return str
+    .replace(/&#039;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+};
+
 const CINEMA_FALLBACK_LIST: FilmReelItem[] = [
   { title: "Backrooms", link: "https://letterboxd.com/film/backrooms-2026/", year: "2026" },
-  { title: "Disclosure Day", link: "https://letterboxd.com/film/disclosure-day/", year: "" },
-  { title: "Anora", link: "https://letterboxd.com/film/anora/", year: "2024" },
-  { title: "Megalopolis", link: "https://letterboxd.com/film/megalopolis-2024/", year: "2024" },
-  { title: "The Seed of the Sacred Fig", link: "https://letterboxd.com/film/the-seed-of-the-sacred-fig/", year: "2024" },
-  { title: "Emilia Pérez", link: "https://letterboxd.com/film/emilia-perez/", year: "2024" },
-  { title: "Challengers", link: "https://letterboxd.com/film/challengers/", year: "2024" },
-  { title: "Kinds of Kindness", link: "https://letterboxd.com/film/kinds-of-kindness/", year: "2024" },
-  { title: "Dune: Part Two", link: "https://letterboxd.com/film/dune-part-two/", year: "2024" },
-  { title: "The Substance", link: "https://letterboxd.com/film/the-substance-2024/", year: "2024" }
+  { title: "Hope", link: "https://letterboxd.com/film/hope-2024-1/", year: "2024" },
+  { title: "All of a Sudden", link: "https://letterboxd.com/film/all-of-a-sudden-2024/", year: "2024" }
 ];
 
 interface LetterboxdFilmReelsProps {
@@ -227,17 +231,6 @@ export default function LetterboxdFilmReels({
             const link = item.getElementsByTagName("link")[0]?.textContent || "";
             const title = item.getElementsByTagName("title")[0]?.textContent || "";
             
-            // Decode HTML entities (like &#039;) for robust matching
-            const decodeEntities = (str: string) => {
-              return str
-                .replace(/&#039;/g, "'")
-                .replace(/&apos;/g, "'")
-                .replace(/&quot;/g, '"')
-                .replace(/&amp;/g, '&')
-                .replace(/&lt;/g, '<')
-                .replace(/&gt;/g, '>');
-            };
-            
             const titleDecoded = decodeEntities(title).toLowerCase();
             const titleRawLower = title.toLowerCase();
             const linkLower = link.toLowerCase();
@@ -260,6 +253,7 @@ export default function LetterboxdFilmReels({
             console.log("[FilmReels] Found list container item in general feed. Parsing description HTML...");
             const descriptionText = listContainerItem.getElementsByTagName("description")[0]?.textContent || "";
             if (descriptionText) {
+              // 1. Standard HTML DOM parsing
               const descDoc = parser.parseFromString(descriptionText, "text/html");
               const aTags = descDoc.getElementsByTagName("a");
               for (let j = 0; j < aTags.length; j++) {
@@ -277,24 +271,108 @@ export default function LetterboxdFilmReels({
                   }
                   
                   parsedFilms.push({
-                    title,
+                    title: decodeEntities(title),
                     link: href,
                     year: filmYear
                   });
                 }
               }
+
+              // 2. Regex-based fallback parser on the description HTML if standard HTML parse returned nothing
+              if (parsedFilms.length === 0) {
+                console.log("[FilmReels] Standard DOM description parse returned 0 films. Running regex fallback on description text...");
+                const anchorRegex = /<a\s+[^>]*href=["'](https?:\/\/(?:www\.)?letterboxd\.com\/film\/[^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+                let anchorMatch;
+                while ((anchorMatch = anchorRegex.exec(descriptionText)) !== null) {
+                  const href = anchorMatch[1].trim();
+                  const rawTitle = anchorMatch[2].replace(/<[^>]*>/g, "").trim();
+                  const title = decodeEntities(rawTitle);
+                  if (title && href) {
+                    let filmYear = "";
+                    const yearMatchInUrl = href.match(/-(\d{4})\/?$/);
+                    const yearMatchInTitle = title.match(/\b(19\d{2}|20\d{2})\b/);
+                    if (yearMatchInUrl) {
+                      filmYear = yearMatchInUrl[1];
+                    } else if (yearMatchInTitle) {
+                      filmYear = yearMatchInTitle[1];
+                    }
+                    parsedFilms.push({
+                      title,
+                      link: href,
+                      year: filmYear
+                    });
+                  }
+                }
+              }
+
               if (parsedFilms.length > 0) {
                 fetchedReal = mainFeedResult.isReal;
                 console.log(`[FilmReels] Successfully parsed ${parsedFilms.length} films from general feed's list item.`);
               }
             }
           }
+
+          // 3. Regex fallback on the entire main feed XML if the list container item was not matched via DOM
+          if (parsedFilms.length === 0) {
+            console.log("[FilmReels] Running regex fallback on entire main feed XML...");
+            const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
+            let itemMatch;
+            while ((itemMatch = itemRegex.exec(mainFeedResult.xmlText)) !== null) {
+              const itemContent = itemMatch[1];
+              const titleMatch = itemContent.match(/<title>([\s\S]*?)<\/title>/i);
+              const linkMatch = itemContent.match(/<link>([\s\S]*?)<\/link>/i);
+              const descMatch = itemContent.match(/<description>([\s\S]*?)<\/description>/i);
+
+              const title = titleMatch ? titleMatch[1] : "";
+              const link = linkMatch ? linkMatch[1] : "";
+              const desc = descMatch ? descMatch[1] : "";
+
+              const titleDecoded = decodeEntities(title).toLowerCase();
+              const linkLower = link.toLowerCase();
+
+              if (
+                linkLower.includes("/list/if-i-can-ill-go-and-see-them-at-the-cinema") || 
+                titleDecoded.includes("if i can") ||
+                titleDecoded.includes("cinema") ||
+                linkLower.includes("cinema")
+              ) {
+                console.log("[FilmReels] Regex found main feed item match. Extracting films from its description...");
+                const anchorRegex = /<a\s+[^>]*href=["'](https?:\/\/(?:www\.)?letterboxd\.com\/film\/[^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+                let anchorMatch;
+                while ((anchorMatch = anchorRegex.exec(desc)) !== null) {
+                  const href = anchorMatch[1].trim();
+                  const rawTitle = anchorMatch[2].replace(/<[^>]*>/g, "").trim();
+                  const fTitle = decodeEntities(rawTitle);
+                  if (fTitle && href) {
+                    let filmYear = "";
+                    const yearMatchInUrl = href.match(/-(\d{4})\/?$/);
+                    const yearMatchInTitle = fTitle.match(/\b(19\d{2}|20\d{2})\b/);
+                    if (yearMatchInUrl) {
+                      filmYear = yearMatchInUrl[1];
+                    } else if (yearMatchInTitle) {
+                      filmYear = yearMatchInTitle[1];
+                    }
+                    parsedFilms.push({
+                      title: fTitle,
+                      link: href,
+                      year: filmYear
+                    });
+                  }
+                }
+                if (parsedFilms.length > 0) {
+                  fetchedReal = mainFeedResult.isReal;
+                  break;
+                }
+              }
+            }
+          }
         }
 
-        // 2. Secondary Option: If list container was not found, try the direct list RSS feed
+        // 4. Secondary Option: Try the direct list RSS feed
+        let listFeedResult: { xmlText: string; isReal: boolean } | null = null;
         if (parsedFilms.length === 0) {
           console.log("[FilmReels] Trying secondary option: list-specific RSS feed...");
-          const listFeedResult = await tryFetchFeed("https://letterboxd.com/erics71/list/if-i-can-ill-go-and-see-them-at-the-cinema/rss/");
+          listFeedResult = await tryFetchFeed("https://letterboxd.com/erics71/list/if-i-can-ill-go-and-see-them-at-the-cinema/rss/");
           if (listFeedResult) {
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(listFeedResult.xmlText, "text/xml");
@@ -356,16 +434,86 @@ export default function LetterboxdFilmReels({
               // Only add actual films, skipping any other lists/links
               if (filmTitle && !link.includes("/list/") && !rawTitle.toLowerCase().includes("list of")) {
                 parsedFilms.push({
-                  title: filmTitle || "Unknown Film",
+                  title: decodeEntities(filmTitle) || "Unknown Film",
                   link: link || "https://letterboxd.com",
                   year: filmYear
                 });
               }
             }
 
+            // Regex fallback on the direct list-specific RSS feed
+            if (parsedFilms.length === 0) {
+              console.log("[FilmReels] List-specific XML parsing returned 0 films. Running regex fallback...");
+              const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
+              let itemMatch;
+              while ((itemMatch = itemRegex.exec(listFeedResult.xmlText)) !== null) {
+                const itemContent = itemMatch[1];
+                const titleMatch = itemContent.match(/<title>([\s\S]*?)<\/title>/i);
+                const linkMatch = itemContent.match(/<link>([\s\S]*?)<\/link>/i);
+                
+                let rawTitle = titleMatch ? titleMatch[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/gi, "$1") : "";
+                let link = linkMatch ? linkMatch[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/gi, "$1") : "";
+                
+                rawTitle = decodeEntities(rawTitle).trim();
+                link = link.trim();
+                
+                if (rawTitle && link && !link.includes("/list/") && !rawTitle.toLowerCase().includes("list of")) {
+                  let filmTitle = "";
+                  let filmYear = "";
+                  
+                  const parenMatch = rawTitle.match(/(.*)\s*\((\d{4})\)/);
+                  const commaMatch = rawTitle.match(/(.*),\s*(\d{4})/);
+                  
+                  if (parenMatch) {
+                    filmTitle = parenMatch[1].trim();
+                    filmYear = parenMatch[2];
+                  } else if (commaMatch) {
+                    filmTitle = commaMatch[1].trim();
+                    filmYear = commaMatch[2];
+                  } else {
+                    filmTitle = rawTitle;
+                  }
+                  
+                  parsedFilms.push({
+                    title: filmTitle,
+                    link: link,
+                    year: filmYear
+                  });
+                }
+              }
+            }
+
             if (parsedFilms.length > 0) {
               fetchedReal = listFeedResult.isReal;
               console.log(`[FilmReels] Successfully parsed ${parsedFilms.length} films from list-specific RSS feed.`);
+            }
+          }
+        }
+
+        // 5. Ultimate Catch-all Regex fallback on any fetched raw XML
+        if (parsedFilms.length === 0 && (mainFeedResult || listFeedResult)) {
+          const fallbackText = mainFeedResult?.xmlText || (listFeedResult ? listFeedResult.xmlText : "");
+          console.log("[FilmReels] Ultimate fallback: scanning for any unique films in raw feed...");
+          const anchorRegex = /<a\s+[^>]*href=["'](https?:\/\/(?:www\.)?letterboxd\.com\/film\/[^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+          let anchorMatch;
+          while ((anchorMatch = anchorRegex.exec(fallbackText)) !== null) {
+            const href = anchorMatch[1].trim();
+            const rawTitle = anchorMatch[2].replace(/<[^>]*>/g, "").trim();
+            const title = decodeEntities(rawTitle);
+            if (title && href && !parsedFilms.some(f => f.link === href)) {
+              let filmYear = "";
+              const yearMatchInUrl = href.match(/-(\d{4})\/?$/);
+              const yearMatchInTitle = title.match(/\b(19\d{2}|20\d{2})\b/);
+              if (yearMatchInUrl) {
+                filmYear = yearMatchInUrl[1];
+              } else if (yearMatchInTitle) {
+                filmYear = yearMatchInTitle[1];
+              }
+              parsedFilms.push({
+                title,
+                link: href,
+                year: filmYear
+              });
             }
           }
         }

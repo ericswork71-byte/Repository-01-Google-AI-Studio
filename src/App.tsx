@@ -288,11 +288,11 @@ export default function App() {
 
               <div class="space-y-2.5" id="${containerId}-items">
                 <div class="animate-pulse space-y-2">
-                  <div class="h-10 bg-slate-950/40 border border-slate-850 rounded-lg"></div>
-                  <div class="h-10 bg-slate-950/40 border border-slate-850 rounded-lg"></div>
-                  <div class="h-10 bg-slate-950/40 border border-slate-850 rounded-lg"></div>
-                  <div class="h-10 bg-slate-950/40 border border-slate-850 rounded-lg"></div>
-                  <div class="h-10 bg-slate-950/40 border border-slate-850 rounded-lg"></div>
+                  <div class="h-10 bg-black border border-black rounded-lg"></div>
+                  <div class="h-10 bg-black border border-black rounded-lg"></div>
+                  <div class="h-10 bg-black border border-black rounded-lg"></div>
+                  <div class="h-10 bg-black border border-black rounded-lg"></div>
+                  <div class="h-10 bg-black border border-black rounded-lg"></div>
                 </div>
               </div>
 
@@ -329,7 +329,7 @@ export default function App() {
                 function render(items, isLive) {
                   statusEl.textContent = isLive ? "Live Sync 🟢" : "Offline 🔒";
                   itemsContainer.innerHTML = items.map(function(movie) {
-                    return '<a href="' + movie.link + '" target="_blank" rel="noopener noreferrer" class="group flex items-center justify-between p-2.5 rounded-lg bg-slate-950/40 border border-slate-850 hover:bg-slate-900/60 hover:border-indigo-500/40 transition duration-300 pointer-events-auto">' +
+                    return '<a href="' + movie.link + '" target="_blank" rel="noopener noreferrer" class="group flex items-center justify-between p-2.5 rounded-lg bg-black border-black hover:bg-neutral-900 hover:border-black transition duration-300 pointer-events-auto text-white">' +
                       '<div class="flex items-center gap-3">' +
                         '<div class="w-8 h-8 rounded-md bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 flex items-center justify-center shadow text-sm group-hover:from-indigo-950 group-hover:to-slate-900 transition-all duration-300 select-none">' +
                           '🍿' +

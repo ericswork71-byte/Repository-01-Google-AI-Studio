@@ -208,7 +208,7 @@ export default function LetterboxdSpainListLiveCard({
             rel="noopener noreferrer"
             className={`group flex items-center justify-between p-2.5 rounded-lg border transition duration-300 pointer-events-auto ${
               isRedTheme 
-                ? 'bg-black/20 border-white/5 hover:bg-black/35 hover:border-white/20 text-white' 
+                ? 'bg-black border-black hover:bg-neutral-900 hover:border-black text-white' 
                 : 'bg-slate-950/40 border-slate-850 hover:bg-slate-900/60 hover:border-indigo-500/40 text-slate-200'
             }`}
             id={`spain-ranking-item-${index + 1}`}

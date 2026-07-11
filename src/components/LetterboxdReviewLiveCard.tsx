@@ -455,9 +455,9 @@ export default function LetterboxdReviewLiveCard({ url, fallbackTitle, themeColo
         return (
           <div 
             key={index} 
-            className={`p-4 rounded-xl border transition-all duration-300 ${
+            className={`p-4 rounded-xl border transition-all duration-300 shadow-xl ${
               isRedTheme 
-                ? 'bg-black/20 border-white/5 hover:border-white/15 hover:bg-black/25 text-white' 
+                ? 'bg-black border-white/10 hover:border-white/20 hover:bg-neutral-950 text-white' 
                 : 'bg-slate-950/40 border-slate-800/80 hover:border-indigo-500/40 text-slate-250'
             }`}
           >
@@ -484,28 +484,10 @@ export default function LetterboxdReviewLiveCard({ url, fallbackTitle, themeColo
 
             <div className="flex flex-col sm:flex-row gap-5 items-start">
               {/* Postage Stamp / Ticket stub design */}
-              <div className={`p-1.5 rounded-sm relative shadow-md shrink-0 select-none ${isRedTheme ? 'bg-[#f4f0e6] border border-[#dcd6c5]' : 'bg-slate-900 border border-slate-800'}`}>
-                {/* Semicircle holes to simulate physical postage stamp / ticket perforations */}
-                {isRedTheme && (
-                  <>
-                    {/* Left edge holes (red matching the background red card) */}
-                    <div className="absolute left-0 top-[16%] -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
-                    <div className="absolute left-0 top-[33%] -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
-                    <div className="absolute left-0 top-[50%] -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
-                    <div className="absolute left-0 top-[66%] -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
-                    <div className="absolute left-0 top-[83%] -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
-
-                    {/* Right edge holes */}
-                    <div className="absolute right-0 top-[16%] translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
-                    <div className="absolute right-0 top-[33%] translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
-                    <div className="absolute right-0 top-[50%] translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
-                    <div className="absolute right-0 top-[66%] translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
-                    <div className="absolute right-0 top-[83%] translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#ab0c0c] z-10" />
-                  </>
-                )}
+              <div className={`p-1.5 rounded-sm relative shadow-md shrink-0 select-none ${isRedTheme ? 'bg-neutral-900 border border-neutral-800' : 'bg-slate-900 border border-slate-800'}`}>
                 
                 {/* Dashed frame border inside stamp */}
-                <div className={`w-full h-full p-0.5 border ${isRedTheme ? 'border-dashed border-stone-400' : 'border-slate-800'}`}>
+                <div className={`w-full h-full p-0.5 border ${isRedTheme ? 'border-dashed border-stone-600' : 'border-slate-800'}`}>
                   <img 
                     src={data.imageUrl} 
                     alt={cleanTitle} 
