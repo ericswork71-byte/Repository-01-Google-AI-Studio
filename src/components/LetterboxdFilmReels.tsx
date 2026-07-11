@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Film, AlertCircle, Loader2, Sparkles, RefreshCw, ExternalLink, Hand } from 'lucide-react';
 
 export interface FilmReelItem {
@@ -412,8 +412,11 @@ export default function LetterboxdFilmReels({
   if (themeColor === 'slate' || !themeColor) {
     const gridFilms = films.slice(0, 6);
     return (
-      <div className="w-full text-center space-y-4">
-        <div className="relative bg-black/25 rounded-2xl p-6 border border-white/5 overflow-hidden shadow-inner">
+      <div 
+        className="w-full text-center space-y-4"
+        onClick={() => setActiveReelIndex(null)}
+      >
+        <div className="relative bg-black/25 rounded-2xl p-6 border border-white/5 overflow-visible shadow-inner">
           {/* Horizontal divider white/light line in the middle */}
           <div className="absolute top-1/2 left-4 right-4 h-px bg-white/10 -translate-y-1/2 pointer-events-none" />
           
@@ -426,15 +429,30 @@ export default function LetterboxdFilmReels({
                   className="flex flex-col items-center justify-center relative group"
                   onMouseEnter={() => setActiveReelIndex(index)}
                   onMouseLeave={() => setActiveReelIndex(null)}
+                  onTouchStart={(e) => {
+                    e.stopPropagation();
+                    if (activeReelIndex !== index) {
+                      setActiveReelIndex(index);
+                    }
+                  }}
                 >
                   <a
                     href={movie.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-105 group-hover:rotate-45 pointer-events-auto shadow-[0_8px_20px_rgba(0,0,0,0.6)]"
+                    onClick={(e) => {
+                      if (activeReelIndex !== index) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setActiveReelIndex(index);
+                      }
+                    }}
+                    className={`relative w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center transition-all duration-500 pointer-events-auto shadow-[0_12px_28px_rgba(0,0,0,0.7)] ${
+                      isHovered ? 'scale-125 sm:scale-130 rotate-45 z-40' : 'scale-100 rotate-0 z-10'
+                    }`}
                     style={{
                       background: 'radial-gradient(circle at 35% 35%, #e2e8f0 0%, #cbd5e1 50%, #94a3b8 100%)',
-                      border: '4px solid #f1f5f9'
+                      border: isHovered ? '4px solid #fde047' : '4px solid #f1f5f9'
                     }}
                   >
                     {/* Concentric rolled tape lines */}
@@ -474,12 +492,25 @@ export default function LetterboxdFilmReels({
                   </a>
 
                   {/* Elegant hover title bubble */}
-                  <div className={`absolute top-[85%] z-30 bg-black/95 text-white border border-white/10 px-2 py-1 rounded shadow-xl text-[10px] font-sans pointer-events-none transition-all duration-300 max-w-[120px] text-center ${
-                    isHovered ? 'opacity-100 scale-100 translate-y-1' : 'opacity-0 scale-90 translate-y-0'
-                  }`}>
-                    <p className="font-bold truncate">{movie.title}</p>
-                    {movie.year && <p className="text-[8px] text-slate-400">({movie.year})</p>}
-                    <p className="text-[7px] text-amber-400 font-mono tracking-wider mt-0.5">OPEN LINK ↗</p>
+                  <div 
+                    className={`absolute left-1/2 -translate-x-1/2 z-50 bg-black/95 text-white border-2 border-amber-300/40 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-xl shadow-[0_15px_35px_rgba(0,0,0,0.8)] backdrop-blur-md text-center pointer-events-none transition-all duration-300 w-max max-w-[180px] sm:max-w-[240px] ${
+                      index < 3 
+                        ? `top-[105%] origin-top ${isHovered ? 'opacity-100 scale-110 translate-y-2' : 'opacity-0 scale-90 translate-y-0'}` 
+                        : `bottom-[105%] origin-bottom ${isHovered ? 'opacity-100 scale-110 -translate-y-2' : 'opacity-0 scale-90 translate-y-0'}`
+                    }`}
+                  >
+                    <p className="font-extrabold text-xs sm:text-sm tracking-tight leading-snug whitespace-normal break-words text-white">
+                      {movie.title}
+                    </p>
+                    {movie.year && (
+                      <p className="text-[10px] sm:text-xs text-amber-300/90 font-semibold font-mono mt-1">
+                        ({movie.year})
+                      </p>
+                    )}
+                    <div className="text-[8px] sm:text-[9px] text-amber-400 font-bold font-mono tracking-wider mt-2.5 flex items-center justify-center gap-1 bg-white/5 py-1 px-2 rounded-md border border-white/10">
+                      <span>OPEN LETTERBOXD</span>
+                      <ExternalLink className="w-2.5 h-2.5 inline" />
+                    </div>
                   </div>
                 </div>
               );
@@ -582,7 +613,7 @@ export default function LetterboxdFilmReels({
                   rotateX: isActive ? 0 : layout.tiltX, // Face reader when active, else tilt
                   rotateY: isActive ? 0 : (layout.tiltY ?? 0),
                   rotate: isActive ? 0 : layout.rotate,    // Straighten on hover to read easily
-                  scale: isActive ? 1.6 : layout.scale,  // Scale up more on hover for readability
+                  scale: isActive ? 1.9 : layout.scale,  // Scale up more on hover for readability
                   zIndex: isActive ? 200 : layout.zIndex,   // Move to topmost stack layer
                   filter: isActive ? 'brightness(1.15)' : 'brightness(1)'
                 }}
@@ -669,16 +700,23 @@ export default function LetterboxdFilmReels({
                   <div 
                     className={`absolute z-20 px-2 py-1.5 max-w-[84px] text-center rounded-sm transition-all duration-500 select-none shadow border flex flex-col items-center justify-center gap-0.5 ${
                       isActive 
-                        ? 'bg-amber-100 border-amber-300 text-slate-950 rotate-0 scale-105 shadow-md opacity-100 pointer-events-auto' 
+                        ? 'bg-amber-50 border-amber-400 text-slate-950 rotate-0 scale-125 shadow-xl opacity-100 pointer-events-auto z-50 rounded-md px-3 py-2 max-w-[130px]' 
                         : 'bg-[#faf8f2]/95 border-[#e2dccb] text-slate-900 -rotate-3 opacity-90 scale-95 pointer-events-auto'
                     }`}
                   >
-                    <p className={`text-[8px] sm:text-[9px] font-mono font-black line-clamp-2 uppercase tracking-tighter leading-tight text-center ${isActive ? 'text-indigo-950' : 'text-slate-800'}`}>
+                    <p className={`font-mono font-black uppercase tracking-tighter leading-snug text-center ${
+                      isActive ? 'text-indigo-950 text-[10px] sm:text-[11px] whitespace-normal break-words line-clamp-3' : 'text-slate-800 text-[8px] sm:text-[9px] line-clamp-2'
+                    }`}>
                       {movie.title}
                     </p>
+                    {movie.year && isActive && (
+                      <span className="text-[8.5px] text-slate-600 font-bold font-mono">
+                        ({movie.year})
+                      </span>
+                    )}
                     {isActive ? (
-                      <span className="text-[6px] text-indigo-600 font-bold tracking-widest uppercase flex items-center gap-0.5 mt-0.5 animate-pulse">
-                        OPEN ↗
+                      <span className="text-[7px] sm:text-[8px] text-indigo-600 font-bold tracking-widest uppercase flex items-center gap-0.5 mt-1 animate-pulse border-t border-indigo-200/50 pt-0.5 w-full justify-center">
+                        OPEN LINK ↗
                       </span>
                     ) : (
                       <span className="text-[5.5px] text-slate-400 font-bold tracking-widest uppercase flex items-center gap-0.5 mt-0.2">
@@ -704,6 +742,45 @@ export default function LetterboxdFilmReels({
 
         {/* Vintage studio floor edge bezel */}
         <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none z-20" />
+
+        {/* Floating Active Reel HUD Tooltip on the front-top */}
+        <AnimatePresence>
+          {activeReelIndex !== null && films[activeReelIndex] && (
+            <motion.div
+              initial={{ opacity: 0, y: 15, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="absolute bottom-4 left-4 right-4 z-40 bg-slate-900/95 border-2 border-indigo-500/45 p-3 rounded-xl shadow-[0_20px_45px_rgba(0,0,0,0.95)] backdrop-blur-md flex items-center justify-between gap-3 text-left pointer-events-auto"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div 
+                  className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-950 to-slate-900 flex items-center justify-center border border-indigo-400/30 flex-shrink-0"
+                  style={{ animation: 'spin 8s linear infinite' }}
+                >
+                  <Film className="w-4 h-4 text-indigo-400" />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-extrabold text-xs sm:text-sm text-white truncate tracking-tight leading-tight">
+                    {films[activeReelIndex].title}
+                  </p>
+                  <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+                    Letterboxd Reel {films[activeReelIndex].year ? `• (${films[activeReelIndex].year})` : ''}
+                  </p>
+                </div>
+              </div>
+              <a
+                href={films[activeReelIndex].link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold font-mono text-[9px] sm:text-[10px] tracking-wider px-3 py-1.5 rounded-lg border border-indigo-400/40 flex items-center gap-1.5 transition-all shrink-0 cursor-pointer shadow-[0_4px_12px_rgba(99,102,241,0.3)]"
+              >
+                <span>OPEN LINK</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Real-time statistics overlay / floor logs info */}
