@@ -561,9 +561,20 @@ ${itemsXml}
         reviewExcerpt = reviewExcerpt.slice(0, 490) + "...";
       }
 
-      // Ensure fine fallbacks for "The Train" or "Scanners"
+      // Ensure fine fallbacks for "The Train" or "Scanners" (including Cloudflare block and Just a moment challenges)
       const isScanners = urlToFetch.toLowerCase().includes('scanners');
-      if (!filmTitle || filmTitle.includes("Error") || filmTitle.length < 2) {
+      if (
+        !filmTitle || 
+        filmTitle.length < 2 || 
+        filmTitle.includes("Error") || 
+        filmTitle.toLowerCase().includes("just a moment") || 
+        filmTitle.toLowerCase().includes("cloudflare") || 
+        filmTitle.toLowerCase().includes("attention required") ||
+        !reviewExcerpt || 
+        reviewExcerpt.length < 10 ||
+        reviewExcerpt.toLowerCase().includes("cloudflare") ||
+        reviewExcerpt.toLowerCase().includes("just a moment")
+      ) {
         if (isScanners) {
           filmTitle = "Scanners";
           year = "1981";
