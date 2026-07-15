@@ -561,19 +561,55 @@ ${itemsXml}
         reviewExcerpt = reviewExcerpt.slice(0, 490) + "...";
       }
 
+      const isInvalidText = (text: string): boolean => {
+        if (!text) return true;
+        const lower = text.toLowerCase();
+        return (
+          lower.includes("error") ||
+          lower.includes("just a moment") ||
+          lower.includes("cloudflare") ||
+          lower.includes("attention required") ||
+          lower.includes("bad gateway") ||
+          lower.includes("gateway timeout") ||
+          lower.includes("forbidden") ||
+          lower.includes("unauthorized") ||
+          lower.includes("not found") ||
+          lower.includes("proxy") ||
+          lower.includes("service unavailable") ||
+          lower.includes("internal server") ||
+          lower.includes("loading") ||
+          lower.includes("challenge") ||
+          lower.includes("captcha") ||
+          lower.includes("checking your browser") ||
+          lower.includes("site access") ||
+          lower.includes("access denied") ||
+          lower.includes("protection") ||
+          lower.includes("security") ||
+          lower.includes("dns") ||
+          lower.includes("offline") ||
+          lower.includes("404") ||
+          lower.includes("502") ||
+          lower.includes("503") ||
+          lower.includes("504") ||
+          lower.includes("bad request") ||
+          lower.includes("unsupported") ||
+          lower.includes("blocked") ||
+          lower.includes("ray id") ||
+          lower.includes("ip address") ||
+          lower.includes("pardon our interruption") ||
+          lower.includes("browser challenge")
+        );
+      };
+
       // Ensure fine fallbacks for "The Train" or "Scanners" (including Cloudflare block and Just a moment challenges)
       const isScanners = urlToFetch.toLowerCase().includes('scanners');
       if (
         !filmTitle || 
         filmTitle.length < 2 || 
-        filmTitle.includes("Error") || 
-        filmTitle.toLowerCase().includes("just a moment") || 
-        filmTitle.toLowerCase().includes("cloudflare") || 
-        filmTitle.toLowerCase().includes("attention required") ||
+        isInvalidText(filmTitle) || 
         !reviewExcerpt || 
         reviewExcerpt.length < 10 ||
-        reviewExcerpt.toLowerCase().includes("cloudflare") ||
-        reviewExcerpt.toLowerCase().includes("just a moment")
+        isInvalidText(reviewExcerpt)
       ) {
         if (isScanners) {
           filmTitle = "Scanners";
